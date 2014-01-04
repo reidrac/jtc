@@ -167,7 +167,7 @@ So basically you can convert between integer and float, and to strings.
 License
 -------
 
-Copyright (C) 2014 Juan J. Martinez <jjm@usebox.net>
+Copyright (C) 2014 Juan J. Martinez <jjm@usebox.net>. All rights reserved.
 
 This is free software under the terms of the MIT license (check LICENSE file
 for further details).
