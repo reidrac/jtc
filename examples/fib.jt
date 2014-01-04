@@ -1,0 +1,14 @@
+# calculate the n-th Fibonacci number
+def main() {
+
+	def fib(n) {
+		if(n <= 1) {
+			return n;
+		}
+		return fib(n-1) + fib(n-2);
+	}
+
+    println(fib(10));
+    return 0;
+}
+

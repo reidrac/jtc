@@ -1,0 +1,31 @@
+# prime numbers of n
+def main() {
+
+	def is_prime(n) {
+		if(n < 2) {
+			return "no";
+		}
+
+		if(n = 2) {
+			return "yes";
+		}
+
+		div := 2;
+		loop(div < n) {
+			if(n mod div = 0) {
+				return "no";
+			}
+			div := div + 1;
+		}
+		return "yes";
+	}
+
+	n := 2;
+	loop(n < 26) {
+		println("is ", n, " prime? ", is_prime(n));
+		n := n + 1;
+	}
+
+	return 0;
+}
+
