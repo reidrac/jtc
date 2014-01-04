@@ -9,11 +9,11 @@ So I've done it again, just for fun. I'm using Python this time and the amazing
 PLY (Python Lex-Yacc) to generate the lexer and the parser. Instead of yet another
 interpreter I wrote a compiler that generates C code.
 
-I don't think this is the best way of doing things, no optimizations, I don't
-care to much, etc; but here you are!
+I don't think this is the best way of doing things, no optimizations whatsoever,
+I don't care too much, etc; but here you are!
 
 How does the language look like? This is how you calculate the 10th Fibonacci
-number using `jt`::
+number using **jt**::
 
   def main() {
 
@@ -29,18 +29,18 @@ number using `jt`::
     return 0;
   }
 
-Take a look to the `examples` directory for more examples.
+Take a look to the **examples** directory for more programs.
 
 
 Requirements
 ------------
 
-The compiler requires::
+The compiler requires:
 
-- Python 3 (3.3.2 used)
-- PLY (3.4 used)
-- uthash (included in the package)
-- A C compiler (by default `gcc`, you can specify a different one with the `CC` env variable)
+- Python 3 (3.3.2 used).
+- PLY (3.4 used).
+- uthash (included in the package).
+- A C compiler (by default **gcc**, you can specify a different one with the `CC` env variable).
 
 You can use test the compiler with::
 
@@ -56,17 +56,17 @@ About the language (jt)
 It's a toy language and I don't think it's useful for anything, specially because
 I bet the compiled programs will leak memory (although it might not).
 
-The program entry point is a function, defined with `def`::
+The program entry point is a function, defined with **def**::
 
   def main() {
 
   }
 
-Any function name can be used, although `main` (as in `main function`) sounds OK. Main
-function can't have parameters (no CLI interface, sorry).
+Any function name can be used, although **main** (as in *main function*) sounds OK. The
+main function can't have parameters (no CLI interface, sorry).
 
-A function can have other functions defined and any variable identifier will be local
-to that function. For example::
+Other functions can be defined inside any function and any variable identifier will be
+local to that function. For example::
 
   def main() {
     a := 1;
@@ -85,7 +85,7 @@ to that function. For example::
 
 This program will print "hello world".
 
-Dynamic typing is used, with the valid types: integer, float and strings. `typeof` can
+Dynamic typing is used, with these valid types: integer, float and strings. **typeof** can
 be used to inspect the type of a variable::
 
   def types() {
@@ -116,25 +116,25 @@ Errors can't be caught, remember this is a toy language!
 
 Supported statements in the language are:
 
-:return expression:
+:return *expression*:
     Exit the function and return the expression to the caller. In the main function
     a numeric value is expected.
 
-:if (expression) { statements } [else { statements }]:
+:if (*expression*) { *statements* } [else { *statements* }]:
     If the expression evaluates to true (anything different from zero), the block
-    of statements delimited by the curly braces is executed. If the `else` part
+    of statements delimited by the curly braces is executed. If the **else** part
     is present, the second block is executed when the expression evaluates to
     false (zero).
 
-:loop (expression) { statements }:
+:loop (*expression*) { *statements* }:
     The statements delimited by the curly braces are executed repeatedly while
     the expression evaluates to true.
 
-:println(expression[, expression]):
+:println(*expression[, expression]*):
     Display on standard output the comma separated list of expressions, followed by
     an end of line.
 
-:typeof(ID):
+:typeof(*identifier*):
     Returns a string with the type of the variable. It can be "<integer>" for integers,
     "<float>" for floats and "<string>" for strings.
 
@@ -142,7 +142,7 @@ Supported statements in the language are:
 Operators
 ---------
 
-The language supports the following operators::
+The language supports the following operators:
 
 - Assignation `:=`
 - Arithmetic operators `+`, `-`, `*`, `/`, `mod`
