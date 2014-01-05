@@ -18,6 +18,9 @@ enum openum { ADD=0, SUB, MUL, DIV, EQ, NE, GT, LT, GE, LE, AND, OR, MOD, NOT };
 
 #define RT_ERR(args...) { printf("RT_ERROR: " args); exit(1); }
 
+#undef uthash_fatal
+#define uthash_fatal(msg) RT_ERR(msg);
+
 /* object system */
 typedef struct obj {
     int type;
