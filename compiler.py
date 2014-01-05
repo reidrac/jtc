@@ -31,8 +31,8 @@ class Id(object):
     FUNC = 11
 
     @staticmethod
-    def add(lineno, type, id):
-        Id.ids[id] = Id(lineno, type)
+    def add(lineno, type, id, params=None):
+        Id.ids[id] = Id(lineno, type, params)
         Id.index += 1
         return Id.ids[id].index
 
@@ -58,10 +58,11 @@ class Id(object):
         except KeyError:
             return None
 
-    def __init__(self, lineno, type):
+    def __init__(self, lineno, type, params=None):
         self.index = Id.index
         self.lineno = lineno
         self.type = type
+        self.params = params
 
     def __repr__(self):
         return u"%r (%r, %r)" % (self.index, self.lineno, self.type)
@@ -79,7 +80,8 @@ def do_func(node):
     Id.enter()
     # make the function available inside itself to support
     # recursive calls
-    Id.add(node.lineno, Id.FUNC, node.value)
+    nparams = len(node.sub[0].sub)
+    Id.add(node.lineno, Id.FUNC, node.value, nparams)
     output = "\n" + func_sign(node) + " { st *_ctx = NULL; "
     for value in node.sub[0].sub:
         index = Id.add(node.sub[0].lineno, Id.ID, value)
@@ -140,6 +142,9 @@ def do_expr(node):
     elif node.type == "call":
         exists = Id.exists(node.value)
         if exists and exists.type == Id.FUNC:
+            if exists.params != len(node.sub[0].sub):
+                print("line %d: %r expects %d parameters" % (node.lineno, node.value, exists.params))
+                exit(1)
             params = ', '.join([do_expr(p) for p in node.sub[0].sub])
             output += "_%s(%s)" % (node.value, params)
         else:
@@ -158,7 +163,8 @@ def do_block(node):
     for c in node.sub:
         if c.type == "func":
             # make the function available to this scope
-            Id.add(c.lineno, Id.FUNC, c.value)
+            nparams = len(c.sub[0].sub)
+            Id.add(c.lineno, Id.FUNC, c.value, nparams)
         elif c.type == "store":
             exists = Id.exists(c.value)
             if exists and exists.type != Id.ID:
