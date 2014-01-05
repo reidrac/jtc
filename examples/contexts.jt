@@ -1,0 +1,21 @@
+# different contexts
+def main() {
+
+    def english(me) {
+        def hello(me) {
+            println("hello ", me);
+        }
+        hello(me);
+    }
+
+    def spanish(me) {
+        def hello(me) {
+            println("hola ", me);
+        }
+        hello(me);
+    }
+
+    english("Juan");
+    spanish("Juan");
+}
+
