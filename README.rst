@@ -85,7 +85,7 @@ local to that function. For example::
 
 This program will print "hello world".
 
-Dynamic typing is used, with these valid types: integer, float and strings. **typeof** can
+Dynamic typing is used, with these valid types: integer, float and string. **typeof** can
 be used to inspect the type of a variable::
 
   def types() {
