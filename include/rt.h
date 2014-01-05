@@ -34,6 +34,16 @@ obj *o_new(int lineno) {
     return o;
 }
 
+void o_del(obj **o) {
+    if((*o)->ref < 1) {
+        if((*o)->type == T_STRING) {
+            free((*o)->sval);
+        }
+        free(*o);
+    }
+    *o = NULL;
+}
+
 obj *o_int(int lineno, int val) {
     obj *o = o_new(lineno);
     o->type = T_INTEGER;
@@ -70,12 +80,7 @@ int o_lval(int lineno, obj *o) {
         default:
             RT_ERR("line %d: undefined logic value\n", lineno);
     }
-    if(!o->ref) {
-        if(o->type == T_STRING) {
-            free(o->sval);
-        }
-        free(o);
-    }
+    o_del(&o);
     return ret;
 }
 
@@ -113,7 +118,8 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
             break;
         }
 
-        goto o_op_cleanup;
+        o_del(&l);
+        return o;
     }
 
     /* type conversions */
@@ -324,20 +330,8 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
         break;
     } /* switch(op) */
 
-o_op_cleanup:
-
-    if(!l->ref) {
-        if(l->type == T_STRING) {
-            free(l->sval);
-        }
-        free(l);
-    }
-    if(r && !r->ref) {
-        if(r->type == T_STRING) {
-            free(r->sval);
-        }
-        free(r);
-    }
+    o_del(&l);
+    o_del(&r);
 
     return o;
 }
@@ -371,14 +365,9 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
             break;
             case T_STRING:
                 s->o->sval = strdup(o->sval);
-                if(!o->ref) {
-                    if(o->type == T_STRING) {
-                        free(o->sval);
-                    }
-                    free(o);
-                }
             break;
         }
+        o_del(&o);
     }
     s->lineno = lineno;
     /* this is just to avoid freeing this object because
@@ -402,13 +391,10 @@ obj *o_return(st **ctx, obj *o) {
 
     HASH_ITER(hh, *ctx, s, tmp) {
         HASH_DEL(*ctx, s);
-        if(!s->o->ref) {
-            if(s->o->type == T_STRING) {
-                free(s->o->sval);
-            }
-            free(s->o);
+        o_del(&s->o);
+        if(s->o) {
+            s->o->ref--;
         }
-        s->o->ref--;
         free(s);
     }
 
@@ -437,12 +423,7 @@ void println(int argc, ...) {
                 printf("%s", o->sval);
             break;
         }
-        if(!o->ref) {
-            if(o->type == T_STRING) {
-                free(o->sval);
-            }
-            free(o);
-        }
+        o_del(&o);
     }
     va_end(argv);
     printf("\n");
@@ -451,12 +432,7 @@ void println(int argc, ...) {
 obj *o_typeof(int lineno, obj *o) {
     char *types[] = { "<integer>", "<float>", "<string>" };
     obj *ret = o_string(lineno, types[o->type]);
-    if(!o->ref) {
-        if(o->type == T_STRING) {
-            free(o->sval);
-        }
-        free(o);
-    }
+    o_del(&o);
     return ret;
 }
 
