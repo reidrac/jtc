@@ -8,8 +8,9 @@
 #include "uthash.h"
 
 #define T_INTEGER 0
-#define T_FLOAT  1
+#define T_FLOAT   1
 #define T_STRING  2
+#define T_DICT    3
 #define T_ID      10
 #define T_FUNC    11
 
@@ -22,11 +23,19 @@ enum openum { ADD=0, SUB, MUL, DIV, EQ, NE, GT, LT, GE, LE, AND, OR, MOD, NOT };
 #define uthash_fatal(msg) RT_ERR(msg);
 
 /* object system */
+
+typedef struct dict {
+	const char *id;
+	struct obj *o;
+	UT_hash_handle hh;
+} dict;
+
 typedef struct obj {
     int type;
     int ival;
     float fval;
     char *sval;
+	dict *dval;
     int ref;
 } obj;
 
@@ -38,10 +47,23 @@ obj *o_new(int lineno) {
 }
 
 void o_del(obj **o) {
+	dict *d, *s, *tmp;
+
     if((*o)->ref < 1) {
         if((*o)->type == T_STRING) {
             free((*o)->sval);
         }
+		if((*o)->type == T_DICT) {
+			d = (*o)->dval;
+			HASH_ITER(hh, d, s, tmp) {
+				HASH_DEL(d, s);
+				o_del(&s->o);
+				if(s->o) {
+					s->o->ref--;
+				}
+				free(s);
+			}
+		}
         free(*o);
     }
     *o = NULL;
@@ -68,8 +90,89 @@ obj *o_string(int lineno, const char *val) {
     return o;
 }
 
+obj *o_dict(int lineno) {
+	obj *o = o_new(lineno);
+	o->type = T_DICT;
+	return o;
+}
+
+obj *o_dict_set(int lineno, dict **d, obj *i, obj *o) {
+	dict *s = NULL;
+
+	HASH_FIND_STR(*d, i->sval, s);
+	if(!s) {
+		s = (dict *)calloc(sizeof(dict), 1);
+		if(!s)
+			RT_ERR("line %d: failed to allocate memory\n", lineno);
+		s->id = strdup(i->sval);
+		HASH_ADD_KEYPTR(hh, *d, s->id, strlen(s->id), s);
+	} else {
+		o_del(&(s->o));
+	}
+	o_del(&i);
+	s->o = o;
+	s->o->ref++;
+	return o;
+}
+
+obj *o_dict_get(int lineno, dict **d, obj *i) {
+	dict *s = NULL;
+
+	HASH_FIND_STR(*d, i->sval, s);
+	if(!s)
+		RT_ERR("line %d: key not found\n", lineno);
+
+	o_del(&i);
+	return s->o;
+}
+
+obj *o_dict_test(int lineno, dict **d, obj *i) {
+	dict *s = NULL;
+	obj *o = o_int(lineno, 1);
+
+	HASH_FIND_STR(*d, i->sval, s);
+	if(!s)
+		o->ival = 0;
+
+	o_del(&i);
+	return o;
+}
+
+obj *o_to_string(int lineno, obj *o) {
+	obj *n = NULL;
+
+	switch(o->type) {
+		case T_STRING:
+			return o;
+		break;
+		case T_INTEGER:
+			n = o_new(lineno);
+			/* FIXME */
+			n->sval = (char *)calloc(sizeof(char), 256);
+			if(!n->sval)
+				RT_ERR("line %d: failed to allocate memory", lineno);
+			snprintf(n->sval, 256, "%i", o->ival);
+			n->type = T_STRING;
+		break;
+		case T_FLOAT:
+			n = o_new(lineno);
+			/* FIXME */
+			n->sval = (char *)calloc(sizeof(char), 256);
+			if(!n->sval)
+				RT_ERR("line %d: failed to allocate memory", lineno);
+			snprintf(n->sval, 256, "%f", o->fval);
+			n->type = T_STRING;
+		break;
+	}
+	o_del(&o);
+
+	return n;
+}
+
 obj *o_clone(int lineno, obj *o) {
     obj *n = NULL;
+	dict *s = NULL, *nd = NULL, *tmp = NULL;
+
     switch(o->type) {
         case T_INTEGER:
             n = o_int(lineno, o->ival);
@@ -80,8 +183,20 @@ obj *o_clone(int lineno, obj *o) {
         case T_STRING:
             n = o_string(lineno, o->sval);
         break;
+		case T_DICT:
+			n = o_dict(lineno);
+			for(s=o->dval; s; s=s->hh.next) {
+				nd = (dict *)calloc(sizeof(dict), 1);
+				if(!nd)
+					RT_ERR("line %d: failed to allocate memory\n", lineno);
+				nd->id = strdup(s->id);
+				nd->o = o_clone(lineno, s->o);
+				HASH_ADD_KEYPTR(hh, tmp, nd->id, strlen(nd->id), nd);
+			}
+			n->dval = tmp;
+		break;
     }
-    o_del(&o);
+	o_del(&o);
     return n;
 }
 
@@ -362,6 +477,37 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
     return o;
 }
 
+void o_print(obj *o) {
+	dict *s = NULL;
+
+	switch(o->type) {
+		case T_INTEGER:
+			printf("%d", o->ival);
+		break;
+		case T_FLOAT:
+			printf("%f", o->fval);
+		break;
+		case T_STRING:
+			printf("%s", o->sval);
+		break;
+		case T_DICT:
+			if(o->dval) {
+				printf("{ ");
+				for(s=o->dval; s; s=s->hh.next) {
+					printf("%s: ", s->id);
+					o_print(s->o);
+					if(s->hh.next) {
+						printf(", ");
+					}
+				}
+				printf(" }");
+			} else {
+				printf("{}");
+			}
+		break;
+	}
+}
+
 /* object storage */
 typedef struct st {
 	int index;
@@ -395,9 +541,14 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
             case T_STRING:
                 s->o->sval = strdup(o->sval);
             break;
+            case T_DICT:
+                s->o->dval = o->dval;
+            break;
         }
         s->o->type = o->type;
-        o_del(&o);
+		if(o->type != T_DICT) {
+			o_del(&o);
+		}
     }
     s->lineno = lineno;
     /* this is just to avoid freeing this object because
@@ -421,10 +572,8 @@ obj *o_return(st **ctx, obj *o) {
 
     HASH_ITER(hh, *ctx, s, tmp) {
         HASH_DEL(*ctx, s);
-        o_del(&s->o);
-        if(s->o) {
-            s->o->ref--;
-        }
+		s->o->ref--;
+		o_del(&s->o);
         free(s);
     }
 
@@ -442,17 +591,7 @@ void println(int argc, ...) {
     va_start(argv, argc);
     for(i=0; i<argc; i++) {
         o = (obj *)va_arg(argv, obj *);
-        switch(o->type) {
-            case T_INTEGER:
-                printf("%d", o->ival);
-            break;
-            case T_FLOAT:
-                printf("%f", o->fval);
-            break;
-            case T_STRING:
-                printf("%s", o->sval);
-            break;
-        }
+		o_print(o);
         o_del(&o);
     }
     va_end(argv);
@@ -460,7 +599,7 @@ void println(int argc, ...) {
 }
 
 obj *o_typeof(int lineno, obj *o) {
-    char *types[] = { "<integer>", "<float>", "<string>" };
+    char *types[] = { "<integer>", "<float>", "<string>", "<dictionary>" };
     obj *ret = o_string(lineno, types[o->type]);
     o_del(&o);
     return ret;

@@ -154,6 +154,12 @@ def do_expr(node):
         output += "o_typeof(%d, %s)" % (node.lineno, do_expr(node.sub[0]))
     elif node.type == "clone":
         output += "o_clone(%d, %s)" % (node.lineno, do_retrieve(node.sub[0]))
+    elif node.type == "dict":
+        output += "o_dict(%d)" % node.lineno
+    elif node.type == "dict-get":
+        output += "o_dict_get(%d, &(%s->dval), o_to_string(%d, %s))" % (node.lineno, do_retrieve(node), node.lineno, do_expr(node.sub[0]))
+    elif node.type == "dict-test":
+        output += "o_dict_test(%d, &(%s->dval), o_to_string(%d, %s))" % (node.lineno, do_retrieve(node), node.lineno, do_expr(node.sub[0]))
 
     return output
 
@@ -191,6 +197,8 @@ def do_block(node):
         elif c.type == "println":
             params = ', '.join([do_expr(p) for p in c.sub[0].sub])
             output += "println(%d, %s); " % (len(c.sub[0].sub), params)
+        elif c.type == "dict-set":
+            output += "o_dict_set(%d, &(%s->dval), o_to_string(%d, %s), %s); " % (c.lineno, do_retrieve(c), c.lineno, do_expr(c.sub[0]), do_expr(c.sub[1]))
         else:
             output += do_expr(c) + "; "
     return output
