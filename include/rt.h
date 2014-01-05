@@ -421,10 +421,10 @@ obj *o_return(st **ctx, obj *o) {
 
     HASH_ITER(hh, *ctx, s, tmp) {
         HASH_DEL(*ctx, s);
-        o_del(&s->o);
-        if(s->o) {
-            s->o->ref--;
-        }
+		s->o->ref--;
+		if(s->o != o) {
+			o_del(&s->o);
+		}
         free(s);
     }
 
