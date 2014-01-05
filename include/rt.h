@@ -85,7 +85,7 @@ int o_lval(int lineno, obj *o) {
 }
 
 obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
-    obj *o = o_new(lineno);
+    obj *o = o_new(lineno), *tmp = NULL;
     o->type = l->type;
 
     /* unary operator */
@@ -112,7 +112,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                         o->ival = !l->ival;
                     break;
                     default:
-                        RT_ERR("line %d: unsuppored type for unary '-'\n", lineno);
+                        RT_ERR("line %d: unsuppored type for unary 'not'\n", lineno);
                     break;
                 }
             break;
@@ -130,31 +130,33 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
             break;
             case T_INTEGER:
                 if(l->type == T_STRING) {
+                    tmp = o_new(lineno);
                     /* FIXME */
-                    r->sval = (char *)calloc(sizeof(char), 256);
-                    if(!r->sval)
+                    tmp->sval = (char *)calloc(sizeof(char), 256);
+                    if(!tmp->sval)
                         RT_ERR("line %d: failed to allocate memory", lineno);
-                    snprintf(r->sval, 256, "%i", r->ival);
-                    r->type = T_STRING;
-                } else { /* float */
-                    r->type = T_FLOAT;
-                    r->fval = (float)r->ival;
+                    snprintf(tmp->sval, 256, "%i", r->ival);
+                    tmp->type = T_STRING;
+                } else { /* to float */
+                    tmp = o_float(lineno, (float)r->ival);
                 }
             break;
             case T_FLOAT:
                 if(l->type == T_STRING) {
+                    tmp = o_new(lineno);
                     /* FIXME */
-                    r->sval = (char *)calloc(sizeof(char), 256);
-                    if(!r->sval)
+                    tmp->sval = (char *)calloc(sizeof(char), 256);
+                    if(!tmp->sval)
                         RT_ERR("line %d: failed to allocate memory", lineno);
-                    snprintf(r->sval, 256, "%f", r->fval);
-                    r->type = T_STRING;
-                } else { /* integer */
-                    r->type = T_INTEGER;
-                    r->ival = (int)r->ival;
+                    snprintf(tmp->sval, 256, "%f", r->fval);
+                    tmp->type = T_STRING;
+                } else { /* to integer */
+                    tmp = o_int(lineno, (int)r->fval);
                 }
             break;
         }
+        o_del(&r);
+        r = tmp;
     }
 
     switch(op) {
