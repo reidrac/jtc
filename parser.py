@@ -74,10 +74,13 @@ def p_statement_return(p):
     p[0] = Node("return", p.lexer.lineno, [p[2]])
 
 
+def p_statement_function(p):
+    """statement : function"""
+    p[0] = p[1]
+
+
 def p_statement_expr_func(p):
-    """statement : expr SC
-                 | function
-                 """
+    """statement : expr SC"""
     p[0] = p[1]
 
 
