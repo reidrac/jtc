@@ -26,7 +26,6 @@ number using **jt**::
     }
 
     println(fib(10));
-    return 0;
   }
 
 Take a look to the **examples** directory for more programs.
@@ -59,7 +58,7 @@ I bet the compiled programs will leak memory (although it might not).
 The program entry point is a function, defined with **def**::
 
   def main() {
-
+    return 0;
   }
 
 Any function name can be used, although **main** (as in *main function*) sounds OK. The
