@@ -3,15 +3,15 @@ JTC = ../compiler.py
 all: hello.jt.out fib.jt.out prime.jt.out reference.jt.out operators.jt.out
 
 hello.jt.out: hello.jt
-	$(JTC) $< 
+	$(JTC) $<
 fib.jt.out: fib.jt
-	$(JTC) $< 
+	$(JTC) $<
 prime.jt.out: prime.jt
-	$(JTC) $< 
+	$(JTC) $<
 reference.jt.out: reference.jt
-	$(JTC) $< 
+	$(JTC) $<
 operators.jt.out: operators.jt
-	$(JTC) $< 
+	$(JTC) $<
 
 clean:
 	rm -f *.out
