@@ -167,7 +167,7 @@ def do_block(node):
             Id.add(c.lineno, Id.FUNC, c.value, nparams)
         elif c.type == "store":
             exists = Id.exists(c.value)
-            if exists and exists.type != Id.ID:
+            if exists and exists.type == Id.FUNC:
                 print("line %d: %r already defined as function in line %d" % (c.lineno, c.value, exists.lineno))
             if not exists:
                 index = Id.add(c.lineno, Id.ID, c.value)
