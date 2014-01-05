@@ -360,14 +360,32 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
             RT_ERR("line %d: failed to allocate memory\n", lineno);
         s->index = id;
 		HASH_ADD_INT(*ctx, index, s);
+        s->o = o;
+    } else {
+        switch(o->type) {
+            case T_INTEGER:
+                s->o->ival = o->ival;
+            break;
+            case T_FLOAT:
+                s->o->fval = o->fval;
+            break;
+            case T_STRING:
+                s->o->sval = strdup(o->sval);
+                if(!o->ref) {
+                    if(o->type == T_STRING) {
+                        free(o->sval);
+                    }
+                    free(o);
+                }
+            break;
+        }
     }
     s->lineno = lineno;
-    s->o = o;
     /* this is just to avoid freeing this object because
      * it is associated to a stored variable */
     s->o->ref++;
 
-    return o;
+    return s->o;
 }
 
 obj *retrieve(st **ctx, int lineno, int id) {
