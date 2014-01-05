@@ -158,7 +158,9 @@ def p_expr_list(p):
     """expresions : expresions COMMA expr
                   | expr
                   |"""
-    if p[1].type == "call-params":
+    if len(p) < 2:
+        sub = None
+    elif p[1].type == "call-params":
         sub = p[1].sub + [p[3]]
     else:
         sub = [p[1]]
