@@ -1,0 +1,5 @@
+# hello world
+def main() {
+    println("hello world!");
+}
+
