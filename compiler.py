@@ -280,6 +280,8 @@ if __name__ == "__main__":
         cmd = [cc, "-Wall", "-I%s" % path.join(home, "include"), fd.name, "-o", source + ".out"]
         if args.debug:
             cmd.append("-ggdb")
+        else:
+            cmd.extend(["-s", "-O2"])
         if args.verbose:
             print("compiling:", ' '.join(cmd))
         try:
