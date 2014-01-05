@@ -10,7 +10,7 @@ import parser
 import lexer
 
 __author__ = "Juan J. Martinez <jjm@usebox.net>"
-__version__ = "0.2"
+__version__ = "0.3"
 app_name = "JTC"
 project_url = "https://github.com/reidrac/jtc/"
 
