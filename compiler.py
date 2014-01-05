@@ -176,7 +176,7 @@ def do_block(node):
             params = ', '.join([do_expr(p) for p in c.sub[0].sub])
             output += "println(%d, %s); " % (len(c.sub[0].sub), params)
         else:
-            do_expr(c) + "; "
+            output += do_expr(c) + "; "
     return output
 
 
