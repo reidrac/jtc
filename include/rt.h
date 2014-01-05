@@ -65,6 +65,23 @@ obj *o_string(int lineno, const char *val) {
     return o;
 }
 
+obj *o_clone(int lineno, obj *o) {
+    obj *n = NULL;
+    switch(o->type) {
+        case T_INTEGER:
+            n = o_int(lineno, o->ival);
+        break;
+        case T_FLOAT:
+            n = o_float(lineno, o->fval);
+        break;
+        case T_STRING:
+            n = o_string(lineno, o->sval);
+        break;
+    }
+    o_del(&o);
+    return n;
+}
+
 int o_lval(int lineno, obj *o) {
     int ret = 0;
     switch(o->type) {

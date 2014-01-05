@@ -114,14 +114,18 @@ while (o_lval(%d, %s)) { %s}
 """ % (node.lineno, do_expr(expr), do_block(block))
 
 
+def do_retrieve(node):
+    if not Id.exists(node.value):
+        print("line %d: undefined identifier %r" % (node.lineno, node.value))
+        exit(1)
+    index = Id.get(node.value).index
+    return "retrieve(&_ctx, %d, %d)" % (node.lineno, index)
+
+
 def do_expr(node):
     output = ""
     if node.type == "retrieve":
-        if not Id.exists(node.value):
-            print("line %d: undefined identifier %r" % (node.lineno, node.value))
-            exit(1)
-        index = Id.get(node.value).index
-        output += "retrieve(&_ctx, %d, %d)" % (node.lineno, index)
+        output += do_retrieve(node)
     elif node.type == "numeric":
         if isinstance(node.value, int):
             output += "o_int(%d, %d)" % (node.lineno, node.value)
@@ -143,6 +147,8 @@ def do_expr(node):
             exit(1)
     elif node.type == "typeof":
         output += "o_typeof(%d, %s)" % (node.lineno, do_expr(node.sub[0]))
+    elif node.type == "clone":
+        output += "o_clone(%d, %s)" % (node.lineno, do_retrieve(node.sub[0]))
 
     return output
 

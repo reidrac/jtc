@@ -2,7 +2,7 @@
 def main() {
 
     def foo(bar) {
-        bar := 2;
+        bar := bar + 1;
     }
 
     a := 1;
@@ -14,5 +14,9 @@ def main() {
 
     foo(a);
     println("after the function call a is ", a);
+
+    # use clone to make a copy
+    foo(clone(a));
+    println("after the function call (with clone) a is ", a);
 }
 

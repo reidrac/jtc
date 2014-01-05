@@ -136,6 +136,11 @@ def p_statement_typeof(p):
     p[0] = Node("typeof", p.lexer.lineno, [p[3]])
 
 
+def p_statement_clone(p):
+    """expr : CLONE LPAR ID RPAR"""
+    p[0] = Node("clone", p.lexer.lineno, [Node("retieve", p.lexer.lineno, value=p[3])])
+
+
 def p_expr_func_call(p):
     """expr : ID LPAR expresions RPAR"""
     p[0] = Node("call", p.lexer.lineno, [p[3]], p[1])

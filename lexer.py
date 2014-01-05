@@ -16,6 +16,7 @@ class Lexer(object):
         'mod': 'MOD',
         'println': 'PRINTLN',
         'typeof': 'TYPEOF',
+        'clone': 'CLONE',
     }
     tokens = (
         'FLOAT',
@@ -50,6 +51,7 @@ class Lexer(object):
 
         'PRINTLN',
         'TYPEOF',
+        'CLONE',
 
         'LCB',
         'RCB',
