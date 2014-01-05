@@ -111,6 +111,10 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                     case T_INTEGER:
                         o->ival = !l->ival;
                     break;
+                    case T_STRING:
+                        o->ival = o->sval && strlen(o->sval);
+                        o->type = T_INTEGER;
+                    break;
                     default:
                         RT_ERR("line %d: unsuppored type for unary 'not'\n", lineno);
                     break;
@@ -358,6 +362,9 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
 		HASH_ADD_INT(*ctx, index, s);
         s->o = o;
     } else {
+        if(s->o->type == T_STRING) {
+            free(s->o->sval);
+        }
         switch(o->type) {
             case T_INTEGER:
                 s->o->ival = o->ival;
@@ -369,6 +376,7 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
                 s->o->sval = strdup(o->sval);
             break;
         }
+        s->o->type = o->type;
         o_del(&o);
     }
     s->lineno = lineno;
