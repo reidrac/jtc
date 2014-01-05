@@ -16,16 +16,12 @@ How does the language look like? This is how you calculate the 10th Fibonacci
 number using **jt**::
 
   def main() {
-
     def fib(n) {
-
       if(n <= 1) {
         return n;
       }
-
       return fib(n-1) + fib(n-2);
     }
-
     println(fib(10));
   }
 
