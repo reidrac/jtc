@@ -23,6 +23,12 @@ def p_function(p):
     p[0] = Node("func", p.lexer.lineno, [p[4], p[7]], p[2])
 
 
+def p_function_error(p):
+    """function : DEF ID LPAR parameters RPAR LCB RCB"""
+    print("line %d: syntax error: empty function %r" % (p.lexer.lineno, p[2]))
+    exit(1)
+
+
 def p_parameters(p):
     """parameters : parameters COMMA ID
                   | ID
