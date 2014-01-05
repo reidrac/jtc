@@ -72,8 +72,8 @@ def func_sign(node):
     params = node.sub[0].sub
     cparams = ', '.join(["obj *%s" % p for p in params])
     return """\
-obj *_%s(%s)\
-""" % (node.value, cparams)
+obj *_%s%d(%s)\
+""" % (node.value, node.lineno, cparams)
 
 
 def do_func(node):
@@ -146,7 +146,7 @@ def do_expr(node):
                 print("line %d: %r expects %d parameters" % (node.lineno, node.value, exists.params))
                 exit(1)
             params = ', '.join([do_expr(p) for p in node.sub[0].sub])
-            output += "_%s(%s)" % (node.value, params)
+            output += "_%s%d(%s)" % (node.value, exists.lineno, params)
         else:
             print("line %d: undefined function %r" % (node.lineno, node.value))
             exit(1)
@@ -162,6 +162,10 @@ def do_block(node):
     output = ""
     for c in node.sub:
         if c.type == "func":
+            exists = Id.exists(c.value)
+            if exists:
+                print("line %d: %r already defined in line %d in this context" % (c.lineno, c.value, exists.lineno))
+                exit(1)
             # make the function available to this scope
             nparams = len(c.sub[0].sub)
             Id.add(c.lineno, Id.FUNC, c.value, nparams)
@@ -213,9 +217,9 @@ def generate(ast):
         output += do_func(f)
 
     output += """
-int _ep() { obj *o = _%s(); return o_lval(0, o); }
+int _ep() { obj *o = _%s%d(); return o_lval(0, o); }
 /* EOF */
-""" % ast.value
+""" % (ast.value, ast.lineno)
 
     return output
 
