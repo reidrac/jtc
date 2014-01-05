@@ -59,6 +59,11 @@ def p_statement_assign(p):
     p[0] = Node("store", p.lexer.lineno, [p[3]], p[1])
 
 
+def p_statement_assign_dict(p):
+    """statement : ID LCB expr RCB ASSIGN expr SC"""
+    p[0] = Node("dict-set", p.lexer.lineno, [p[3], p[6]], p[1])
+
+
 def p_statement_if(p):
     """statement : IF LPAR expr RPAR LCB statements RCB"""
     p[0] = Node("if", p.lexer.lineno, [p[3], p[6]], p[1])
@@ -138,6 +143,21 @@ def p_expr_string(p):
 def p_expr_id(p):
     """expr : ID"""
     p[0] = Node("retrieve", p.lexer.lineno, value=p[1])
+
+
+def p_expr_dict(p):
+    """expr : LCB RCB"""
+    p[0] = Node("dict", p.lexer.lineno)
+
+
+def p_expr_dict_get(p):
+    """expr : ID LCB expr RCB"""
+    p[0] = Node("dict-get", p.lexer.lineno, [p[3]], p[1])
+
+
+def p_expr_dict_test(p):
+    """expr : ID LCB expr RCB Q"""
+    p[0] = Node("dict-test", p.lexer.lineno, [p[3]], p[1])
 
 
 def p_statement_typeof(p):

@@ -57,6 +57,7 @@ class Lexer(object):
         'RCB',
         'SC',
         'COMMA',
+        'Q',
     )
 
     t_ignore = ' \t'
@@ -81,6 +82,7 @@ class Lexer(object):
     t_RCB = r'}'
     t_SC = r';'
     t_COMMA = r','
+    t_Q = r'\?'
 
     def t_ID(self, t):
         r'[a-zA-Z][a-zA-Z_0-9]*'
