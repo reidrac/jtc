@@ -1,4 +1,4 @@
-# function parameters use references reference
+# function parameters use a reference
 def main() {
 
     def foo(bar) {
@@ -7,6 +7,8 @@ def main() {
 
     a := 1;
 
+    # has no effect, 1 is not a variable
+    foo(1);
 
     println("before the function call a is ", a);
 
