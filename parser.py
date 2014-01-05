@@ -170,10 +170,10 @@ def p_error(p):
     #exit(1)
 
 
-def parse(source):
+def parse(source, debug=True):
     lexer = Lexer()
     lexer.build()
-    yacc.yacc()
+    yacc.yacc(debug=debug)
     return yacc.parse(source, lexer=lexer.lexer)
 
 if __name__ == "__main__":

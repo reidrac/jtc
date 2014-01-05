@@ -260,7 +260,7 @@ if __name__ == "__main__":
         print(l.test(data))
         exit(0)
 
-    ast = parser.parse(data)
+    ast = parser.parse(data, debug=args.debug)
     if not ast:
         exit(1)
     ast.source = source
