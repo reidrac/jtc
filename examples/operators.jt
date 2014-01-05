@@ -1,0 +1,52 @@
+# fun with operators
+def main() {
+    a := 2;
+    b := 3;
+
+    println("with a = ", a, " ", typeof(a));
+    println("with b = ", b, " ", typeof(b));
+
+    println("a + b = ", a + b);
+    println("a - b = ", a - b);
+    println("a * b = ", a * b);
+    println("a / b = ", a / b);
+    println("a mod b = ", a mod b);
+    println("(0.0 + a) / b = ", (0.0 + a) / b);
+
+    def bool(v) {
+        if(v) {
+            return "true";
+        } else {
+            return "false";
+        }
+    }
+
+    println("a = b is ", bool(a = b));
+    println("a <> b is ", bool(a <> b));
+    println("a > b is ", bool(a > b));
+    println("a < b is ", bool(a < b));
+    println("a <= b is ", bool(a <= b));
+    println("a >= b is ", bool(a >= b));
+    println("a is ", bool(a));
+    println("not a is ", bool(not a));
+
+    println("---------------------");
+
+    a := "foo";
+
+    println("with a = ", a, " ", typeof(a));
+    println("with b = ", b, " ", typeof(b));
+
+    println("a + b = ", a + b);
+    println("a + \"bar\" = ", a + "bar");
+
+    println("a = b is ", bool(a = b));
+    println("a <> b is ", bool(a <> b));
+    println("a > b is ", bool(a > b));
+    println("a < b is ", bool(a < b));
+    println("a <= b is ", bool(a <= b));
+    println("a >= b is ", bool(a >= b));
+    println("a is ", bool(a));
+    println("not a is ", bool(not a));
+
+}
