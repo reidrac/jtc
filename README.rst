@@ -40,7 +40,7 @@ The compiler requires:
 
 You can use test the compiler with::
 
-  ./compiler.py examples.fib.jt
+  ./compiler.py examples/fib.jt
   ./examples/fib.jt.out
 
 It should print `55`.
