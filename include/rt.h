@@ -142,9 +142,9 @@ obj *o_dict_index(int lineno, obj *o) {
 	obj *n = NULL;
 
 	switch(o->type) {
-		case T_STRING:
+		case T_STRING: /* shouldn't happen! */
 			return o;
-		break;
+			break;
 		case T_INTEGER:
 			n = o_new(lineno);
 			/* FIXME */
@@ -153,7 +153,7 @@ obj *o_dict_index(int lineno, obj *o) {
 				RT_ERR("line %d: failed to allocate memory", lineno);
 			snprintf(n->sval, 256, "%i", o->ival);
 			n->type = T_STRING;
-		break;
+			break;
 		case T_FLOAT:
 			n = o_new(lineno);
 			/* FIXME */
@@ -162,10 +162,10 @@ obj *o_dict_index(int lineno, obj *o) {
 				RT_ERR("line %d: failed to allocate memory", lineno);
 			snprintf(n->sval, 256, "%f", o->fval);
 			n->type = T_STRING;
-		break;
+			break;
 		default:
 			RT_ERR("line %d: invalid dictionary key\n", lineno);
-		break;
+			break;
 	}
 	o_del(&o);
 
@@ -179,13 +179,13 @@ obj *o_clone(int lineno, obj *o) {
     switch(o->type) {
         case T_INTEGER:
             n = o_int(lineno, o->ival);
-        break;
+			break;
         case T_FLOAT:
             n = o_float(lineno, o->fval);
-        break;
+			break;
         case T_STRING:
             n = o_string(lineno, o->sval);
-        break;
+			break;
 		case T_DICT:
 			n = o_dict(lineno);
 			for(s=o->dval; s; s=s->hh.next) {
@@ -197,7 +197,7 @@ obj *o_clone(int lineno, obj *o) {
 				HASH_ADD_KEYPTR(hh, tmp, nd->id, strlen(nd->id), nd);
 			}
 			n->dval = tmp;
-		break;
+			break;
     }
 	o_del(&o);
     return n;
@@ -208,10 +208,10 @@ int o_lval(int lineno, obj *o) {
     switch(o->type) {
         case T_INTEGER:
             ret = o->ival;
-            break;
+			break;
         case T_FLOAT:
             ret = o->fval;
-            break;
+			break;
         case T_STRING:
             ret = o->sval && strlen(o->sval);
             break;
@@ -230,34 +230,34 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
     if(r == NULL) {
         switch(op) {
             default:
-            break;
+				break;
             case SUB: /* minus */
                 switch(l->type) {
                     case T_INTEGER:
                         o->ival = -l->ival;
-                    break;
+						break;
                     case T_FLOAT:
                         o->fval = -l->fval;
-                    break;
+						break;
                     default:
                         RT_ERR("line %d: unsuppored type for unary '-'\n", lineno);
-                    break;
+						break;
                 }
-            break;
+				break;
             case NOT:
                 switch(l->type) {
                     case T_INTEGER:
                         o->ival = !l->ival;
-                    break;
+						break;
                     case T_STRING:
                         o->ival = o->sval && strlen(o->sval);
                         o->type = T_INTEGER;
-                    break;
+						break;
                     default:
                         RT_ERR("line %d: unsuppored type for unary 'not'\n", lineno);
-                    break;
+						break;
                 }
-            break;
+				break;
         }
 
         o_del(&l);
@@ -269,7 +269,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
         switch(r->type) {
             case T_STRING:
                 RT_ERR("line %d: unsuported conversion\n", lineno);
-            break;
+				break;
             case T_INTEGER:
                 if(l->type == T_STRING) {
                     tmp = o_new(lineno);
@@ -282,7 +282,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 } else { /* to float */
                     tmp = o_float(lineno, (float)r->ival);
                 }
-            break;
+				break;
             case T_FLOAT:
                 if(l->type == T_STRING) {
                     tmp = o_new(lineno);
@@ -295,7 +295,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 } else { /* to integer */
                     tmp = o_int(lineno, (int)r->fval);
                 }
-            break;
+				break;
         }
         o_del(&r);
         r = tmp;
@@ -303,175 +303,175 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
 
     switch(op) {
         default:
-        break;
+			break;
         case ADD:
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival + r->ival;
-                break;
+					break;
                 case T_FLOAT:
                     o->fval = l->fval + r->fval;
-                break;
+					break;
                 case T_STRING:
                     o->sval = (char *)calloc(sizeof(char), strlen(l->sval)+strlen(r->sval)+1);
                     strncpy(o->sval, l->sval, strlen(l->sval));
                     strncpy(o->sval+strlen(l->sval), r->sval, strlen(r->sval));
-                break;
+					break;
             }
-        break;
+			break;
         case SUB:
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival - r->ival;
-                break;
+					break;
                 case T_FLOAT:
                     o->fval = l->fval - r->fval;
-                break;
+					break;
                 default:
                     RT_ERR("line %d: unsuppored type for '-'\n", lineno);
-                break;
+					break;
             }
-        break;
+			break;
         case MUL:
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival * r->ival;
-                break;
+					break;
                 case T_FLOAT:
                     o->fval = l->fval * r->fval;
-                break;
+					break;
                 default:
                     RT_ERR("line %d: unsuppored type for '*'\n", lineno);
-                break;
+					break;
             }
-        break;
+			break;
         case DIV:
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival / r->ival;
-                break;
+					break;
                 case T_FLOAT:
                     o->fval = l->fval / r->fval;
-                break;
+					break;
                 default:
                     RT_ERR("line %d: unsuppored type for '/'\n", lineno);
-                break;
+					break;
             }
-        break;
+			break;
         case GT:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival > r->ival;
-                break;
+					break;
                 case T_FLOAT:
                     o->ival = l->fval > r->fval;
-                break;
+					break;
                 default:
                     o->ival = strcmp(l->sval, r->sval) > 0;
-                break;
+					break;
             }
-        break;
+			break;
         case GE:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival >= r->ival;
-                break;
+					break;
                 case T_FLOAT:
                     o->ival = l->fval >= r->fval;
-                break;
+					break;
                 default:
                     o->ival = strcmp(l->sval, r->sval) >= 0;
-                break;
+					break;
             }
-        break;
+			break;
         case LT:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival < r->ival;
-                break;
+					break;
                 case T_FLOAT:
                     o->ival = l->fval < r->fval;
-                break;
+					break;
                 default:
                     o->ival = strcmp(l->sval, r->sval) < 0;
-                break;
+					break;
             }
-        break;
+			break;
         case LE:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival <= r->ival;
-                break;
+					break;
                 case T_FLOAT:
                     o->ival = l->fval <= r->fval;
-                break;
+					break;
                 default:
                     o->ival = strcmp(l->sval, r->sval) <= 0;
-                break;
+					break;
             }
-        break;
+			break;
         case EQ:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival == r->ival;
-                break;
+					break;
                 case T_FLOAT:
                     o->ival = l->fval == r->fval;
-                break;
+					break;
                 default:
                     o->ival = strcmp(l->sval, r->sval) == 0;
-                break;
+					break;
             }
-        break;
+			break;
         case NE:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival != r->ival;
-                break;
+					break;
                 case T_FLOAT:
                     o->ival = l->fval != r->fval;
-                break;
+					break;
                 default:
                     o->ival = strcmp(l->sval, r->sval) != 0;
-                break;
+					break;
             }
-        break;
+			break;
         case AND:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival && r->ival;
-                break;
+					break;
                 default:
                     RT_ERR("line %d: unsuppored type for 'and'\n", lineno);
             }
-        break;
+			break;
         case OR:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival || r->ival;
-                break;
+					break;
                 default:
                     RT_ERR("line %d: unsuppored type for 'or'\n", lineno);
             }
-        break;
+			break;
         case MOD:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival % r->ival;
-                break;
+					break;
                 default:
                     RT_ERR("line %d: unsuppored type for 'mod'\n", lineno);
             }
-        break;
+			break;
     } /* switch(op) */
 
     o_del(&l);
@@ -486,13 +486,13 @@ void o_print(obj *o) {
 	switch(o->type) {
 		case T_INTEGER:
 			printf("%d", o->ival);
-		break;
+			break;
 		case T_FLOAT:
 			printf("%f", o->fval);
-		break;
+			break;
 		case T_STRING:
 			printf("%s", o->sval);
-		break;
+			break;
 		case T_DICT:
 			if(o->dval) {
 				printf("{ ");
@@ -507,7 +507,7 @@ void o_print(obj *o) {
 			} else {
 				printf("{}");
 			}
-		break;
+			break;
 	}
 }
 
@@ -537,16 +537,16 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
         switch(o->type) {
             case T_INTEGER:
                 s->o->ival = o->ival;
-            break;
+				break;
             case T_FLOAT:
                 s->o->fval = o->fval;
-            break;
+				break;
             case T_STRING:
                 s->o->sval = strdup(o->sval);
-            break;
+				break;
             case T_DICT:
                 s->o->dval = o->dval;
-            break;
+				break;
         }
         s->o->type = o->type;
 		if(o->type != T_DICT) {
