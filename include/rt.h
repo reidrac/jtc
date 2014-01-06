@@ -16,7 +16,6 @@
 
 enum openum { ADD=0, SUB, MUL, DIV, EQ, NE, GT, LT, GE, LE, AND, OR, MOD, NOT };
 
-
 #define RT_ERR(args...) { printf("RT_ERROR: " args); exit(1); }
 
 #undef uthash_fatal
@@ -201,6 +200,13 @@ obj *o_clone(int lineno, obj *o) {
     }
 	o_del(&o);
     return n;
+}
+
+obj *o_typeof(int lineno, obj *o) {
+    char *types[] = { "<integer>", "<float>", "<string>", "<dictionary>" };
+    obj *ret = o_string(lineno, types[o->type]);
+    o_del(&o);
+    return ret;
 }
 
 int o_lval(int lineno, obj *o) {
@@ -606,6 +612,7 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
 				break;
         }
         s->o->type = o->type;
+		/* dict is always a reference */
 		if(o->type != T_DICT) {
 			o_del(&o);
 		}
@@ -658,13 +665,6 @@ void println(int argc, ...) {
     }
     va_end(argv);
     printf("\n");
-}
-
-obj *o_typeof(int lineno, obj *o) {
-    char *types[] = { "<integer>", "<float>", "<string>", "<dictionary>" };
-    obj *ret = o_string(lineno, types[o->type]);
-    o_del(&o);
-    return ret;
 }
 
 /* C entry point */
