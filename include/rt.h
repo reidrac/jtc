@@ -593,7 +593,11 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
         s->index = id;
 		HASH_ADD_INT(*ctx, index, s);
         s->o = o;
+		/* this is just to avoid freeing this object because
+		 * it is associated to a stored variable */
+		s->o->ref++;
     } else {
+		/* replace the existing object, it already has a reference */
         if(s->o->type == T_STRING) {
             free(s->o->sval);
         }
@@ -612,16 +616,10 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
 				break;
         }
         s->o->type = o->type;
-		/* dict is always a reference */
-		if(o->type != T_DICT) {
-			o_del(&o);
-		}
     }
     s->lineno = lineno;
-    /* this is just to avoid freeing this object because
-     * it is associated to a stored variable */
-    s->o->ref++;
 
+	o_del(&o);
     return s->o;
 }
 
