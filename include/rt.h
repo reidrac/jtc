@@ -97,8 +97,11 @@ obj *o_dict(int lineno) {
 	return o;
 }
 
-obj *o_dict_set(int lineno, dict **d, obj *i, obj *o) {
-	dict *s = NULL;
+obj *o_dict_set(int lineno, obj *od, obj *i, obj *o) {
+	dict *s = NULL, **d = &(od->dval);
+
+	if(od->type != T_DICT)
+		RT_ERR("line %d: not a dictionary\n", lineno);
 
 	HASH_FIND_STR(*d, i->sval, s);
 	if(!s) {
@@ -118,10 +121,13 @@ obj *o_dict_set(int lineno, dict **d, obj *i, obj *o) {
 	return o;
 }
 
-obj *o_dict_get(int lineno, dict **d, obj *i) {
-	dict *s = NULL;
+obj *o_dict_get(int lineno, obj *od, obj *i) {
+	dict *s = NULL, *d = od->dval;
 
-	HASH_FIND_STR(*d, i->sval, s);
+	if(od->type != T_DICT)
+		RT_ERR("line %d: not a dictionary\n", lineno);
+
+	HASH_FIND_STR(d, i->sval, s);
 	if(!s)
 		RT_ERR("line %d: key not found\n", lineno);
 
@@ -129,11 +135,14 @@ obj *o_dict_get(int lineno, dict **d, obj *i) {
 	return s->o;
 }
 
-obj *o_dict_test(int lineno, dict **d, obj *i) {
-	dict *s = NULL;
+obj *o_dict_test(int lineno, obj *od, obj *i) {
+	dict *s = NULL, *d = od->dval;
 	obj *o = o_int(lineno, 1);
 
-	HASH_FIND_STR(*d, i->sval, s);
+	if(od->type != T_DICT)
+		RT_ERR("line %d: not a dictionary\n", lineno);
+
+	HASH_FIND_STR(d, i->sval, s);
 	if(!s)
 		o->ival = 0;
 

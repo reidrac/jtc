@@ -170,7 +170,7 @@ def do_expr(node):
             func = "o_dict_get"
         else:
             func = "o_dict_test"
-        output += "%s(%d, &(%s->dval), %s)" % (func, node.lineno, do_retrieve(node), dict_index)
+        output += "%s(%d, %s, %s)" % (func, node.lineno, do_retrieve(node), dict_index)
 
     return output
 
@@ -210,7 +210,7 @@ def do_block(node):
             output += "println(%d, %s);\n" % (len(c.sub[0].sub), params)
         elif c.type == "dict-set":
             dict_index = do_dict_index(c)
-            output += "o_dict_set(%d, &(%s->dval), %s, %s);\n" % (c.lineno, do_retrieve(c), dict_index, do_expr(c.sub[1]))
+            output += "o_dict_set(%d, %s, %s, %s);\n" % (c.lineno, do_retrieve(c), dict_index, do_expr(c.sub[1]))
         else:
             output += do_expr(c) + "; "
     return output
