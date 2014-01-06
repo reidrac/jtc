@@ -274,9 +274,6 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
     /* type conversions */
     if(l->type != r->type) {
         switch(r->type) {
-            case T_STRING:
-                RT_ERR("line %d: unsuported conversion\n", lineno);
-				break;
             case T_INTEGER:
                 if(l->type == T_STRING) {
                     tmp = o_new(lineno);
@@ -302,6 +299,9 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 } else { /* to integer */
                     tmp = o_int(lineno, (int)r->fval);
                 }
+				break;
+			default:
+                RT_ERR("line %d: unsupported conversion\n", lineno);
 				break;
         }
         o_del(&r);
