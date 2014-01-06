@@ -189,6 +189,16 @@ to strings). For example::
     a{1.0} := 1.0;
   }
 
+The operator **{*expr*}?** can be used to check if *expr* key exists in the dictionary. For
+example::
+
+  def main() {
+    a := {};
+    if(not a{"key"}?) {
+      println("\"key\" doesn't exist");
+    }
+  }
+
 Dictionaries can contain other dictionaries but a reference variable is required as only
 one level can be accessed with the **{*expr*}** operator. For example::
 
