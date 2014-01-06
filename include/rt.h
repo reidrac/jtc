@@ -191,6 +191,7 @@ obj *o_clone(int lineno, obj *o) {
 			break;
 		case T_DICT:
 			n = o_dict(lineno);
+			n->ref++;
 			for(s=o->dval; s; s=s->hh.next) {
 				nd = (dict *)calloc(sizeof(dict), 1);
 				if(!nd)
