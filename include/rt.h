@@ -215,6 +215,9 @@ int o_lval(int lineno, obj *o) {
         case T_STRING:
             ret = o->sval && strlen(o->sval);
             break;
+		case T_DICT:
+            ret = HASH_COUNT(o->dval);
+            break;
         default:
             RT_ERR("line %d: undefined logic value\n", lineno);
     }
