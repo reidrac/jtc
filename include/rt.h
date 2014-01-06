@@ -268,7 +268,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                         o->type = T_INTEGER;
 						break;
 					case T_DICT:
-                        o->ival = !HASH_COUNT(o->dval);
+                        o->ival = !HASH_COUNT(l->dval);
                         o->type = T_INTEGER;
 						break;
                     default:
