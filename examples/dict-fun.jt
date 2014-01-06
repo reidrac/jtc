@@ -1,0 +1,68 @@
+# fun with dictionaries
+def main() {
+
+    def bool(v) {
+        if(v) {
+            return "yes";
+        } else {
+            return "no";
+        }
+    }
+
+    # create a dictionary
+    a := {};
+
+    # set items
+    a{1} := 1;
+    a{"one"} := "one";
+    a{1.0} := 1.0;
+
+    println("typeof a is ", typeof(a));
+    println("a contents are ", a);
+
+    println("does key 1 exist? ", bool( a{1}? ));
+    println("does key \"foo\" exist? ", bool( a{"foo"}? ));
+
+    b := {};
+
+    # b is empty
+    if(not b) {
+        println("b is empty!");
+    }
+
+    b := a;
+
+    if(not b) {
+        # won't run!
+        println("b is empty!");
+    }
+
+    println("is a length equal to b length? ", bool( a = b ));
+
+    # we can't use two indexes, but we can use references
+    # but it means that we can have loops!
+    b{"foo"} := {};
+    foo := b{"foo"};
+
+    foo{"bar"} := "sub-dictionary";
+    println("foo is ", foo);
+    println("b is ", b);
+
+    # dictionaries use references
+    a{1} := "changed";
+
+    println("a is ", a);
+    println("b is ", b);
+
+    # unless we use clone
+    b := clone(b);
+
+    a{"one"} := "another change!";
+
+    println("is a length equal to b length? ", bool( a = b ));
+
+    # yes, still the same lenght... but they're different!
+    println("a is ", a);
+    println("b is ", b);
+}
+
