@@ -81,8 +81,8 @@ local to that function. For example::
 
 This program will print "hello world".
 
-Dynamic typing is used, with these valid types: integer, float and string. **typeof** can
-be used to inspect the type of a variable::
+Dynamic typing is used, with these valid types: integer (signed 64-bit), float, string
+and dictionary. **typeof** can be used to inspect the type of a variable::
 
   def types() {
     a := 1;
@@ -91,11 +91,14 @@ be used to inspect the type of a variable::
     println(a, " is ", typeof(a));
     a := "foo";
     println(a, " is ", typeof(a));
+    a := {};
+    println(a, " is ", typeof(a));
   }
   # will print:
   # 1 is <integer>
   # 1.000000 is <float>
   # foo is <string>
+  # {} is <dictionary>
 
 Although some checks are performed at compilation time, the run-time will report
 any problem in execution time (specially related to the dynamic types). For example::
@@ -161,6 +164,50 @@ Some type conversions are supported depending on the first operand::
   # RT_ERROR: line 7: unsuported conversion
 
 So basically you can convert between integer and float, and to strings.
+
+
+Dictionaries
+------------
+
+The language support dictionaries. A dictionary can be created with **{}**. For example::
+
+  def main() {
+    a := {};
+  }
+  # a contains an empty dictionary
+
+Any expression but dictionaries can be used as key (internally all the keys are converted
+to strings). For example::
+
+  def main() {
+    # create a dictionary
+    a := {};
+
+    # set items
+    a{1} := 1;
+    a{"one"} := "one";
+    a{1.0} := 1.0;
+  }
+
+Dictionaries can contain other dictionaries but a reference variable is required as only
+one level. For example::
+
+  def main() {
+    a := {};
+    a{"foo"} := {};
+    foo := a{"foo"};
+    foo{"bar"} := "second level";
+
+    println(a);
+    println(foo);
+  }
+  # { foo: { bar: second level } }
+  # { bar: second level }
+
+Beware: the references are not checked for loops! As in any other type, **clone** can be
+used to make an independent copy of a dictionary.
+
+Take a look to **examples/fib-memo.jt** for a complete example using dictionaries.
 
 
 License
