@@ -138,7 +138,7 @@ obj *o_dict_test(int lineno, dict **d, obj *i) {
 	return o;
 }
 
-obj *o_to_string(int lineno, obj *o) {
+obj *o_dict_index(int lineno, obj *o) {
 	obj *n = NULL;
 
 	switch(o->type) {
@@ -162,6 +162,9 @@ obj *o_to_string(int lineno, obj *o) {
 				RT_ERR("line %d: failed to allocate memory", lineno);
 			snprintf(n->sval, 256, "%f", o->fval);
 			n->type = T_STRING;
+		break;
+		default:
+			RT_ERR("line %d: invalid dictionary key\n", lineno);
 		break;
 	}
 	o_del(&o);

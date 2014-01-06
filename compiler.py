@@ -124,6 +124,14 @@ def do_retrieve(node):
     return "retrieve(&_ctx, %d, %d)" % (node.lineno, index)
 
 
+def do_dict_index(node):
+    if node.sub[0].type == "string":
+        output = do_expr(node.sub[0])
+    else:
+        output = "o_dict_index(%d, %s)" % (node.lineno, do_expr(node.sub[0]))
+    return output
+
+
 def do_expr(node):
     output = ""
     if node.type == "retrieve":
@@ -156,10 +164,13 @@ def do_expr(node):
         output += "o_clone(%d, %s)" % (node.lineno, do_retrieve(node.sub[0]))
     elif node.type == "dict":
         output += "o_dict(%d)" % node.lineno
-    elif node.type == "dict-get":
-        output += "o_dict_get(%d, &(%s->dval), o_to_string(%d, %s))" % (node.lineno, do_retrieve(node), node.lineno, do_expr(node.sub[0]))
-    elif node.type == "dict-test":
-        output += "o_dict_test(%d, &(%s->dval), o_to_string(%d, %s))" % (node.lineno, do_retrieve(node), node.lineno, do_expr(node.sub[0]))
+    elif node.type in ("dict-get", "dict-test"):
+        dict_index = do_dict_index(node)
+        if node.type == "dict-get":
+            func = "o_dict_get"
+        else:
+            func = "o_dict_test"
+        output += "%s(%d, &(%s->dval), %s)" % (func, node.lineno, do_retrieve(node), dict_index)
 
     return output
 
@@ -183,22 +194,23 @@ def do_block(node):
                 index = Id.add(c.lineno, Id.ID, c.value)
             else:
                 index = Id.get(c.value).index
-            output += "store(&_ctx, %d, %d, %s); " % (c.lineno, index, do_expr(c.sub[0]))
+            output += "store(&_ctx, %d, %d, %s);\n" % (c.lineno, index, do_expr(c.sub[0]))
         elif c.type == "if":
-            output += do_if(c)
+            output += do_if(c) + "\n"
         elif c.type == "if-else":
-            output += do_if_else(c)
+            output += do_if_else(c) + "\n"
         elif c.type == "loop":
-            output += do_loop(c)
+            output += do_loop(c) + "\n"
         elif c.type == "return":
-            output += "return o_return(&_ctx, %s); " % do_expr(c.sub[0])
+            output += "return o_return(&_ctx, %s);\n" % do_expr(c.sub[0])
             # we need the context!
             Id.no_func = True
         elif c.type == "println":
             params = ', '.join([do_expr(p) for p in c.sub[0].sub])
-            output += "println(%d, %s); " % (len(c.sub[0].sub), params)
+            output += "println(%d, %s);\n" % (len(c.sub[0].sub), params)
         elif c.type == "dict-set":
-            output += "o_dict_set(%d, &(%s->dval), o_to_string(%d, %s), %s); " % (c.lineno, do_retrieve(c), c.lineno, do_expr(c.sub[0]), do_expr(c.sub[1]))
+            dict_index = do_dict_index(c)
+            output += "o_dict_set(%d, &(%s->dval), %s, %s);\n" % (c.lineno, do_retrieve(c), dict_index, do_expr(c.sub[1]))
         else:
             output += do_expr(c) + "; "
     return output
