@@ -138,6 +138,9 @@ def do_expr(node):
         output += do_retrieve(node)
     elif node.type == "numeric":
         if isinstance(node.value, int):
+            if node.value > 2147483647 or node.value < -2147483648:
+                print("line %d: integer out of range" % node.lineno)
+                exit(1)
             output += "o_int(%d, %d)" % (node.lineno, node.value)
         else:
             output += "o_float(%d, %d)" % (node.lineno, node.value)
