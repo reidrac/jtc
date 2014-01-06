@@ -324,6 +324,9 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                     strncpy(o->sval, l->sval, strlen(l->sval));
                     strncpy(o->sval+strlen(l->sval), r->sval, strlen(r->sval));
 					break;
+				default:
+					RT_ERR("line %d: unsupported type for '+'\n", lineno);
+					break;
             }
 			break;
         case SUB:
@@ -374,8 +377,14 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 case T_FLOAT:
                     o->ival = l->fval > r->fval;
 					break;
-                default:
+                case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) > 0;
+					break;
+				case T_DICT:
+					o->ival = HASH_COUNT(l->dval) > HASH_COUNT(r->dval);
+					break;
+				default:
+					RT_ERR("line %d: unsupported type for '>'\n", lineno);
 					break;
             }
 			break;
@@ -388,8 +397,14 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 case T_FLOAT:
                     o->ival = l->fval >= r->fval;
 					break;
-                default:
+                case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) >= 0;
+					break;
+				case T_DICT:
+					o->ival = HASH_COUNT(l->dval) >= HASH_COUNT(r->dval);
+					break;
+				default:
+					RT_ERR("line %d: unsupported type for '>='\n", lineno);
 					break;
             }
 			break;
@@ -402,8 +417,14 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 case T_FLOAT:
                     o->ival = l->fval < r->fval;
 					break;
-                default:
+				case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) < 0;
+					break;
+				case T_DICT:
+					o->ival = HASH_COUNT(l->dval) < HASH_COUNT(r->dval);
+					break;
+				default:
+					RT_ERR("line %d: unsupported type for '<'\n", lineno);
 					break;
             }
 			break;
@@ -416,8 +437,14 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 case T_FLOAT:
                     o->ival = l->fval <= r->fval;
 					break;
-                default:
+                case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) <= 0;
+					break;
+				case T_DICT:
+					o->ival = HASH_COUNT(l->dval) <= HASH_COUNT(r->dval);
+					break;
+				default:
+					RT_ERR("line %d: unsupported type for '<='\n", lineno);
 					break;
             }
 			break;
@@ -430,8 +457,15 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 case T_FLOAT:
                     o->ival = l->fval == r->fval;
 					break;
-                default:
+                case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) == 0;
+					break;
+				case T_DICT:
+					/* FIXME? */
+					o->ival = HASH_COUNT(l->dval) == HASH_COUNT(r->dval);
+					break;
+				default:
+					RT_ERR("line %d: unsupported type for '='\n", lineno);
 					break;
             }
 			break;
@@ -444,8 +478,15 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 case T_FLOAT:
                     o->ival = l->fval != r->fval;
 					break;
-                default:
+                case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) != 0;
+					break;
+				case T_DICT:
+					/* FIXME? */
+					o->ival = HASH_COUNT(l->dval) != HASH_COUNT(r->dval);
+					break;
+				default:
+					RT_ERR("line %d: unsupported type for '<>'\n", lineno);
 					break;
             }
 			break;
@@ -455,8 +496,12 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 case T_INTEGER:
                     o->ival = l->ival && r->ival;
 					break;
+				case T_DICT:
+					o->ival = HASH_COUNT(l->dval) && HASH_COUNT(r->dval);
+					break;
                 default:
                     RT_ERR("line %d: unsupported type for 'and'\n", lineno);
+					break;
             }
 			break;
         case OR:
@@ -465,8 +510,12 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 case T_INTEGER:
                     o->ival = l->ival || r->ival;
 					break;
+				case T_DICT:
+					o->ival = HASH_COUNT(l->dval) || HASH_COUNT(r->dval);
+					break;
                 default:
                     RT_ERR("line %d: unsupported type for 'or'\n", lineno);
+					break;
             }
 			break;
         case MOD:
@@ -477,6 +526,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
 					break;
                 default:
                     RT_ERR("line %d: unsupported type for 'mod'\n", lineno);
+					break;
             }
 			break;
     } /* switch(op) */
