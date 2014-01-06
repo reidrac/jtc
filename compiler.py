@@ -143,7 +143,7 @@ def do_expr(node):
                 exit(1)
             output += "o_int(%d, %d)" % (node.lineno, node.value)
         else:
-            output += "o_float(%d, %d)" % (node.lineno, node.value)
+            output += "o_float(%d, %f)" % (node.lineno, node.value)
     elif node.type == "string":
         output += "o_string(%d, %s)" % (node.lineno, node.value)
     elif node.type == "binop":
