@@ -1,0 +1,19 @@
+# calculate the 92-th Fibonacci number (with memoization)
+def main() {
+
+	def fib(n, memo) {
+		if(not memo{n}?) {
+			if(n <= 1) {
+				memo{n} := n;
+			} else {
+				memo{n} := fib(n-1, memo) + fib(n-2, memo);
+			}
+		}
+		return memo{n};
+	}
+
+    # 92 is the further we can get with 64 bit signed ints!
+    println(fib(92, {}));
+    return 0;
+}
+
