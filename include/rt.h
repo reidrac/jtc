@@ -259,7 +259,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                         o->ival = !l->ival;
 						break;
                     case T_STRING:
-                        o->ival = !(o->sval && strlen(o->sval));
+                        o->ival = !(l->sval && strlen(l->sval));
                         o->type = T_INTEGER;
 						break;
 					case T_DICT:
