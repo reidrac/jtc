@@ -138,9 +138,6 @@ def do_expr(node):
         output += do_retrieve(node)
     elif node.type == "numeric":
         if isinstance(node.value, int):
-            if node.value > 2147483647 or node.value < -2147483648:
-                print("line %d: integer out of range" % node.lineno)
-                exit(1)
             output += "o_int(%d, %d)" % (node.lineno, node.value)
         else:
             output += "o_float(%d, %f)" % (node.lineno, node.value)
@@ -316,7 +313,7 @@ if __name__ == "__main__":
     try:
         fd.write(c)
         fd.close()
-        cmd = [cc, "-Wall", "-I%s" % path.join(home, "include"), fd.name, "-o", source + ".out"]
+        cmd = [cc, "-std=c99", "-Wall", "-I%s" % path.join(home, "include"), fd.name, "-o", source + ".out"]
         if args.debug:
             cmd.append("-ggdb")
         else:

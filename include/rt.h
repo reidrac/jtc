@@ -1,9 +1,13 @@
 #ifndef __RT_H__
 #define __RT_H__
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
+#include <inttypes.h>
 
 #include "uthash.h"
 
@@ -31,7 +35,7 @@ typedef struct dict {
 
 typedef struct obj {
     int type;
-    int ival;
+    int64_t ival;
     float fval;
     char *sval;
 	dict *dval;
@@ -68,7 +72,7 @@ void o_del(obj **o) {
     *o = NULL;
 }
 
-obj *o_int(int lineno, int val) {
+obj *o_int(int lineno, int64_t val) {
     obj *o = o_new(lineno);
     o->type = T_INTEGER;
     o->ival = val;
@@ -152,7 +156,7 @@ obj *o_dict_index(int lineno, obj *o) {
 			n->sval = (char *)calloc(sizeof(char), 256);
 			if(!n->sval)
 				RT_ERR("line %d: failed to allocate memory", lineno);
-			snprintf(n->sval, 256, "%i", o->ival);
+			snprintf(n->sval, 256, "%" PRId64, o->ival);
 			n->type = T_STRING;
 			break;
 		case T_FLOAT:
@@ -290,7 +294,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                     tmp->sval = (char *)calloc(sizeof(char), 256);
                     if(!tmp->sval)
                         RT_ERR("line %d: failed to allocate memory", lineno);
-                    snprintf(tmp->sval, 256, "%i", r->ival);
+                    snprintf(tmp->sval, 256, "%" PRId64, r->ival);
                     tmp->type = T_STRING;
                 } else { /* to float */
                     tmp = o_float(lineno, (float)r->ival);
@@ -551,7 +555,7 @@ void o_print(obj *o) {
 
 	switch(o->type) {
 		case T_INTEGER:
-			printf("%d", o->ival);
+			printf("%" PRId64, o->ival);
 			break;
 		case T_FLOAT:
 			printf("%f", o->fval);
