@@ -207,7 +207,7 @@ one level can be accessed with the **{*expr*}** operator. For example::
 Beware: the references are not checked for loops! As in any other type, **clone** can be
 used to make an independent copy of a dictionary.
 
-Take a look to **examples/fib-memo.jt** for a complete example using dictionaries.
+Take a look to **examples/dict-fun.jt** for a complete example using dictionaries.
 
 
 License
