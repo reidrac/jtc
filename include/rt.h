@@ -602,6 +602,10 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
 		 * it is associated to a stored variable */
 		s->o->ref++;
     } else {
+		if(o == s->o)
+			/* in fact we can */
+			RT_ERR("line %d: can't assign to itself\n", lineno);
+
 		/* replace the existing object, it already has a reference */
         if(s->o->type == T_STRING) {
             free(s->o->sval);
