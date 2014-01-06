@@ -190,7 +190,7 @@ to strings). For example::
   }
 
 Dictionaries can contain other dictionaries but a reference variable is required as only
-one level. For example::
+one level can be accessed with the **{*expr*}** operator. For example::
 
   def main() {
     a := {};
