@@ -60,10 +60,8 @@ void o_del(obj **o) {
 			d = (*o)->dval;
 			HASH_ITER(hh, d, s, tmp) {
 				HASH_DEL(d, s);
-				o_del(&s->o);
-				if(s->o) {
-					s->o->ref--;
-				}
+				s->o->ref--;
+				o_del(&(s->o));
 				free(s);
 			}
 		}
@@ -620,6 +618,7 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
 				break;
             case T_DICT:
                 s->o->dval = o->dval;
+				s->o->ref++;
 				break;
         }
         s->o->type = o->type;
