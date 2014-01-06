@@ -216,7 +216,7 @@ int o_lval(int lineno, obj *o) {
             ret = o->ival;
 			break;
         case T_FLOAT:
-            ret = o->fval;
+            ret = (int)o->fval;
 			break;
         case T_STRING:
             ret = o->sval && strlen(o->sval);
