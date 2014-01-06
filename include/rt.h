@@ -106,11 +106,13 @@ obj *o_dict_set(int lineno, dict **d, obj *i, obj *o) {
 		s->id = strdup(i->sval);
 		HASH_ADD_KEYPTR(hh, *d, s->id, strlen(s->id), s);
 	} else {
+		s->o->ref--;
 		o_del(&(s->o));
 	}
-	o_del(&i);
 	s->o = o;
 	s->o->ref++;
+
+	o_del(&i);
 	return o;
 }
 
@@ -166,8 +168,8 @@ obj *o_dict_index(int lineno, obj *o) {
 			RT_ERR("line %d: invalid dictionary key\n", lineno);
 			break;
 	}
-	o_del(&o);
 
+	o_del(&o);
 	return n;
 }
 
