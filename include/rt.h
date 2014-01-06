@@ -243,7 +243,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                         o->fval = -l->fval;
 						break;
                     default:
-                        RT_ERR("line %d: unsuppored type for unary '-'\n", lineno);
+                        RT_ERR("line %d: unsupported type for unary '-'\n", lineno);
 						break;
                 }
 				break;
@@ -257,7 +257,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                         o->type = T_INTEGER;
 						break;
                     default:
-                        RT_ERR("line %d: unsuppored type for unary 'not'\n", lineno);
+                        RT_ERR("line %d: unsupported type for unary 'not'\n", lineno);
 						break;
                 }
 				break;
@@ -331,7 +331,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                     o->fval = l->fval - r->fval;
 					break;
                 default:
-                    RT_ERR("line %d: unsuppored type for '-'\n", lineno);
+                    RT_ERR("line %d: unsupported type for '-'\n", lineno);
 					break;
             }
 			break;
@@ -344,7 +344,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                     o->fval = l->fval * r->fval;
 					break;
                 default:
-                    RT_ERR("line %d: unsuppored type for '*'\n", lineno);
+                    RT_ERR("line %d: unsupported type for '*'\n", lineno);
 					break;
             }
 			break;
@@ -357,7 +357,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                     o->fval = l->fval / r->fval;
 					break;
                 default:
-                    RT_ERR("line %d: unsuppored type for '/'\n", lineno);
+                    RT_ERR("line %d: unsupported type for '/'\n", lineno);
 					break;
             }
 			break;
@@ -452,7 +452,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                     o->ival = l->ival && r->ival;
 					break;
                 default:
-                    RT_ERR("line %d: unsuppored type for 'and'\n", lineno);
+                    RT_ERR("line %d: unsupported type for 'and'\n", lineno);
             }
 			break;
         case OR:
@@ -462,7 +462,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                     o->ival = l->ival || r->ival;
 					break;
                 default:
-                    RT_ERR("line %d: unsuppored type for 'or'\n", lineno);
+                    RT_ERR("line %d: unsupported type for 'or'\n", lineno);
             }
 			break;
         case MOD:
@@ -472,7 +472,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                     o->ival = l->ival % r->ival;
 					break;
                 default:
-                    RT_ERR("line %d: unsuppored type for 'mod'\n", lineno);
+                    RT_ERR("line %d: unsupported type for 'mod'\n", lineno);
             }
 			break;
     } /* switch(op) */
