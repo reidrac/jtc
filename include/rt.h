@@ -195,6 +195,7 @@ obj *o_clone(int lineno, obj *o) {
 					RT_ERR("line %d: failed to allocate memory\n", lineno);
 				nd->id = strdup(s->id);
 				nd->o = o_clone(lineno, s->o);
+				nd->o->ref++;
 				HASH_ADD_KEYPTR(hh, tmp, nd->id, strlen(nd->id), nd);
 			}
 			n->dval = tmp;
