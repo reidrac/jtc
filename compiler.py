@@ -12,7 +12,7 @@ import lexer
 __author__ = "Juan J. Martinez <jjm@usebox.net>"
 __version__ = "0.4"
 app_name = "JTC"
-project_url = "https://github.com/reidrac/jtc/"
+project_url = "http://www.usebox.net/jjm/jtc/"
 
 operators = ('+', '-', '*', '/', '=', '<>', '>', '<', '>=', '<=', 'and', 'or', 'mod', 'not')
 enum = ('ADD', 'SUB', 'MUL', 'DIV', 'EQ', 'NE', 'GT', 'LT', 'GE', 'LE', 'AND', 'OR', 'MOD', 'NOT')
