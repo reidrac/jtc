@@ -40,7 +40,7 @@ def main() {
     println("is a length equal to b length? ", bool( a = b ));
 
     # we can't use two indexes, but we can use references
-    # but it means that we can have loops!
+    # (although it means that we can have loops)
     b{"foo"} := {};
     foo := b{"foo"};
 
@@ -61,7 +61,7 @@ def main() {
 
     println("is a length equal to b length? ", bool( a = b ));
 
-    # yes, still the same lenght... but they're different!
+    # yes, still the same length... but they're different!
     println("a is ", a);
     println("b is ", b);
 }
