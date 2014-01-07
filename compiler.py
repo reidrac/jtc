@@ -72,7 +72,7 @@ class Id(object):
 def func_sign(node):
     params = node.sub[0].sub
     cparams = ', '.join(["obj *%s" % p for p in params])
-    return """ obj *_%s(%s)""" % (node.uvalue, cparams)
+    return """obj *_%s(%s)""" % (node.uvalue, cparams)
 
 
 def do_func(node):
