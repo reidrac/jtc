@@ -1,0 +1,65 @@
+# binary search tree implementation
+def main() {
+
+	# insert a new item in the tree
+	def insert(item, tree) {
+
+		# create a new tree node
+		def new_node(node, item, l, r) {
+			node{"i"} := item;
+			node{"l"} := l;
+			node{"r"} := r;
+
+			return node;
+		}
+
+		# search for the right place to insert a node
+		def search(item, node) {
+			if(not node{"i"}?) {
+				return node;
+			}
+			if(node{"i"} = item) {
+				return node;
+			}
+
+			if(node{"i"} > item) {
+				return search(item, node{"l"});
+			}
+
+			return search(item, node{"r"});
+		}
+
+		# create the new node in the right place
+		new := search(item, tree);
+		return new_node(new, item, {}, {});
+	}
+
+	# in-order tree traversal
+	def inorder(out, node) {
+		if(not node{"i"}?) {
+			return "";
+		}
+
+		if(node{"l"}?) {
+			inorder(out, node{"l"});
+		}
+		out := out + " " + node{"i"};
+		if(node{"r"}?) {
+			inorder(out, node{"r"});
+		}
+	}
+
+	# create a tree and add some items
+	root := insert(10, {});
+	insert(4, root);
+	insert(7, root);
+	insert(9, root);
+	insert(14, root);
+	insert(5, root);
+	insert(1, root);
+	println("our \"tree\": ", root);
+
+	out := "sorted: ";
+	inorder(out, root);
+	println(out);
+}

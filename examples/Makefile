@@ -1,6 +1,6 @@
 JTC = ../compiler.py
 
-all: hello.jt.out fib.jt.out prime.jt.out reference.jt.out operators.jt.out contexts.jt.out fib-memo.jt.out dict-fun.jt.out
+all: hello.jt.out fib.jt.out prime.jt.out reference.jt.out operators.jt.out contexts.jt.out fib-memo.jt.out dict-fun.jt.out bstree.jt.out
 
 hello.jt.out: hello.jt
 	$(JTC) $<
@@ -17,6 +17,8 @@ contexts.jt.out: contexts.jt
 fib-memo.jt.out: fib-memo.jt
 	$(JTC) $<
 dict-fun.jt.out: dict-fun.jt
+	$(JTC) $<
+bstree.jt.out: bstree.jt
 	$(JTC) $<
 
 clean:
