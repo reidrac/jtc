@@ -177,7 +177,7 @@ The language support dictionaries. A dictionary can be created with **{}**. For 
   # a contains an empty dictionary
 
 Any expression but dictionaries can be used as key (internally all the keys are converted
-to strings). For example::
+to strings)::
 
   def main() {
     # create a dictionary
@@ -189,8 +189,7 @@ to strings). For example::
     a{1.0} := 1.0;
   }
 
-The operator **{*expr*}?** can be used to check if *expr* key exists in the dictionary. For
-example::
+The operator **{expr}?** can be used to check if *expr* key exists in the dictionary::
 
   def main() {
     a := {};
@@ -200,7 +199,7 @@ example::
   }
 
 Dictionaries can contain other dictionaries but a reference variable is required as only
-one level can be accessed with the **{*expr*}** operator. For example::
+one level can be accessed with the **{expr}** operator. For example::
 
   def main() {
     a := {};
@@ -215,7 +214,7 @@ one level can be accessed with the **{*expr*}** operator. For example::
   # { bar: second level }
 
 Beware: the references are not checked for loops! As in any other type, **clone** can be
-used to make an independent copy of a dictionary.
+used to make a copy of a dictionary.
 
 Take a look to **examples/dict-fun.jt** for a complete example using dictionaries.
 
