@@ -10,7 +10,7 @@ import parser
 import lexer
 
 __author__ = "Juan J. Martinez <jjm@usebox.net>"
-__version__ = "0.4"
+__version__ = "0.5"
 app_name = "JTC"
 project_url = "http://www.usebox.net/jjm/jtc/"
 
