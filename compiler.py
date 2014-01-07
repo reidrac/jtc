@@ -31,8 +31,8 @@ class Id(object):
     FUNC = 11
 
     @staticmethod
-    def add(lineno, type, id, params=None):
-        Id.ids[id] = Id(lineno, type, params)
+    def add(lineno, type, id, uvalue=None, params=None):
+        Id.ids[id] = Id(lineno, type, uvalue, params)
         Id.index += 1
         return Id.ids[id].index
 
@@ -58,10 +58,11 @@ class Id(object):
         except KeyError:
             return None
 
-    def __init__(self, lineno, type, params=None):
+    def __init__(self, lineno, type, uvalue=None, params=None):
         self.index = Id.index
         self.lineno = lineno
         self.type = type
+        self.uvalue = uvalue
         self.params = params
 
     def __repr__(self):
@@ -71,9 +72,7 @@ class Id(object):
 def func_sign(node):
     params = node.sub[0].sub
     cparams = ', '.join(["obj *%s" % p for p in params])
-    return """\
-obj *_%s%d(%s)\
-""" % (node.value, node.lineno, cparams)
+    return """ obj *_%s(%s)""" % (node.uvalue, cparams)
 
 
 def do_func(node):
@@ -81,7 +80,7 @@ def do_func(node):
     # make the function available inside itself to support
     # recursive calls
     nparams = len(node.sub[0].sub)
-    Id.add(node.lineno, Id.FUNC, node.value, nparams)
+    Id.add(node.lineno, Id.FUNC, node.value, node.uvalue, nparams)
     output = "\n" + func_sign(node) + " { st *_ctx = NULL; "
     for value in node.sub[0].sub:
         index = Id.add(node.sub[0].lineno, Id.ID, value)
@@ -154,7 +153,7 @@ def do_expr(node):
                 print("line %d: %r expects %d parameters" % (node.lineno, node.value, exists.params))
                 exit(1)
             params = ', '.join([do_expr(p) for p in node.sub[0].sub])
-            output += "_%s%d(%s)" % (node.value, exists.lineno, params)
+            output += "_%s(%s)" % (exists.uvalue, params)
         else:
             print("line %d: undefined function %r" % (node.lineno, node.value))
             exit(1)
@@ -185,7 +184,7 @@ def do_block(node):
                 exit(1)
             # make the function available to this scope
             nparams = len(c.sub[0].sub)
-            Id.add(c.lineno, Id.FUNC, c.value, nparams)
+            Id.add(c.lineno, Id.FUNC, c.value, c.uvalue, nparams)
         elif c.type == "store":
             exists = Id.exists(c.value)
             if exists and exists.type == Id.FUNC:
@@ -237,9 +236,9 @@ def generate(ast):
         output += do_func(f)
 
     output += """
-int _ep() { obj *o = _%s%d(); return o_lval(0, o); }
+int _ep() { obj *o = _%s(); return o_lval(0, o); }
 /* EOF */
-""" % (ast.value, ast.lineno)
+""" % ast.uvalue
 
     return output
 
