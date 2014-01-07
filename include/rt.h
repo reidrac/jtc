@@ -657,8 +657,8 @@ obj *o_return(st **ctx, obj *o) {
 
     HASH_ITER(hh, *ctx, s, tmp) {
         HASH_DEL(*ctx, s);
-		s->o->ref--;
 		if(s->o != o) {
+			s->o->ref--;
 			o_del(&s->o);
 		}
         free(s);
