@@ -66,7 +66,7 @@ class Id(object):
         self.params = params
 
     def __repr__(self):
-        return u"%r (%r, %r)" % (self.index, self.lineno, self.type)
+        return "%r (%r, %r)" % (self.index, self.lineno, self.type)
 
 
 def func_sign(node):

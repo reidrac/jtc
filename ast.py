@@ -20,8 +20,8 @@ class Node(object):
             self.uvalue = "%s_%d" % (self.value, Node.unique[self.value])
 
     def __repr__(self):
-        return u"(%d: %s -> sub: %r value: %r)" % (self.lineno,
-                                                   self.type,
-                                                   self.sub,
-                                                   self.value,
-                                                   )
+        return "(%d: %s -> sub: %r value: %r)" % (self.lineno,
+                                                  self.type,
+                                                  self.sub,
+                                                  self.value,
+                                                  )
