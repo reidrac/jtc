@@ -32,7 +32,7 @@ enum openum { ADD=0, SUB, MUL, DIV, EQ, NE, GT, LT, GE, LE, AND, OR, MOD, NOT };
 /* object system */
 
 typedef struct dict {
-	const char *id;
+	char *id;
 	struct obj *o;
 	UT_hash_handle hh;
 } dict;
@@ -53,25 +53,30 @@ obj *o_new(int lineno) {
     return o;
 }
 
-void o_del(obj **o) {
-	dict *d, *s, *tmp;
+void o_dict_del(dict *d);
 
+void o_del(obj **o) {
     if((*o)->ref < 1) {
         if((*o)->type == T_STRING) {
             free((*o)->sval);
         }
 		if((*o)->type == T_DICT) {
-			d = (*o)->dval;
-			HASH_ITER(hh, d, s, tmp) {
-				HASH_DEL(d, s);
-				s->o->ref--;
-				o_del(&(s->o));
-				free(s);
-			}
+            o_dict_del((*o)->dval);
 		}
         free(*o);
+        *o = NULL;
     }
-    *o = NULL;
+}
+
+void o_dict_del(dict *d) {
+	dict *s = NULL, *tmp = NULL;
+    HASH_ITER(hh, d, s, tmp) {
+        HASH_DEL(d, s);
+        s->o->ref--;
+        o_del(&(s->o));
+        free(s->id);
+        free(s);
+    }
 }
 
 obj *o_int(int lineno, int64_t val) {
@@ -126,12 +131,12 @@ obj *o_dict_set(int lineno, obj *od, obj *i, obj *o) {
 }
 
 obj *o_dict_get(int lineno, obj *od, obj *i) {
-	dict *s = NULL, *d = od->dval;
+	dict *s = NULL;
 
 	if(od->type != T_DICT)
 		RT_ERR("line %d: not a dictionary\n", lineno);
 
-	HASH_FIND_STR(d, i->sval, s);
+	HASH_FIND_STR(od->dval, i->sval, s);
 	if(!s)
 		RT_ERR("line %d: key not found\n", lineno);
 
@@ -140,13 +145,13 @@ obj *o_dict_get(int lineno, obj *od, obj *i) {
 }
 
 obj *o_dict_test(int lineno, obj *od, obj *i) {
-	dict *s = NULL, *d = od->dval;
+	dict *s = NULL;
 	obj *o = o_int(lineno, 1);
 
 	if(od->type != T_DICT)
 		RT_ERR("line %d: not a dictionary\n", lineno);
 
-	HASH_FIND_STR(d, i->sval, s);
+	HASH_FIND_STR(od->dval, i->sval, s);
 	if(!s)
 		o->ival = 0;
 
@@ -245,6 +250,7 @@ int o_lval(int lineno, obj *o) {
             break;
         default:
             RT_ERR("line %d: undefined logic value\n", lineno);
+            break;
     }
     o_del(&o);
     return ret;
@@ -636,7 +642,6 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
 				break;
             case T_DICT:
                 s->o->dval = o->dval;
-				s->o->ref++;
 				break;
         }
         s->o->type = o->type;
@@ -659,14 +664,14 @@ obj *retrieve(st **ctx, int lineno, int id) {
 obj *o_return(st **ctx, obj *o) {
     st *s = NULL, *tmp = NULL;
 
+    o->ref++;
     HASH_ITER(hh, *ctx, s, tmp) {
         HASH_DEL(*ctx, s);
-		if(s->o != o) {
-			s->o->ref--;
-			o_del(&s->o);
-		}
+        s->o->ref--;
+        o_del(&s->o);
         free(s);
     }
+    o->ref--;
 
     return o;
 }
@@ -681,7 +686,7 @@ void println(int argc, ...) {
 
     va_start(argv, argc);
     for(i=0; i<argc; i++) {
-        o = (obj *)va_arg(argv, obj *);
+        o = va_arg(argv, obj *);
 		o_print(o);
         o_del(&o);
     }
