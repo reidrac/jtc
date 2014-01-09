@@ -3,6 +3,10 @@
 
 #define _GNU_SOURCE
 
+#ifdef RTE_DEBUG
+#include <mcheck.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -687,7 +691,14 @@ void println(int argc, ...) {
 
 /* C entry point */
 int main() {
+#ifdef RTE_DEBUG
+    printf("** RTE_DEBUG ON **\n");
+    mtrace();
     return _ep();
+    muntrace();
+#else
+    return _ep();
+#endif
 }
 
 #endif
