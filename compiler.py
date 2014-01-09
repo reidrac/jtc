@@ -307,12 +307,16 @@ if __name__ == "__main__":
         exit(1)
 
     cc = environ.get("CC", "gcc")
+    cflags = environ.get("CFLAGS", None)
     home = environ.get("JTCHOME", path.abspath(path.dirname(__file__)))
     fd = NamedTemporaryFile(mode="wt", suffix=".c", delete=False)
     try:
         fd.write(c)
         fd.close()
-        cmd = [cc, "-std=c99", "-Wall", "-I%s" % path.join(home, "include"), fd.name, "-o", source + ".out"]
+        cmd = [cc,]
+        if cflags:
+            cmd += cflags.split(" ")
+        cmd +=  ["-std=c99", "-Wall", "-I%s" % path.join(home, "include"), fd.name, "-o", source + ".out"]
         if args.debug:
             cmd.append("-ggdb")
         else:
