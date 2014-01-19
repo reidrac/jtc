@@ -1,3 +1,4 @@
+/* ex: set softtabstop=4 shiftwidth=4 expandtab: */
 #ifndef __RT_H__
 #define __RT_H__
 
@@ -32,9 +33,9 @@ enum openum { ADD=0, SUB, MUL, DIV, EQ, NE, GT, LT, GE, LE, AND, OR, MOD, NOT };
 /* object system */
 
 typedef struct dict {
-	char *id;
-	struct obj *o;
-	UT_hash_handle hh;
+    char *id;
+    struct obj *o;
+    UT_hash_handle hh;
 } dict;
 
 typedef struct obj {
@@ -42,7 +43,7 @@ typedef struct obj {
     int64_t ival;
     float fval;
     char *sval;
-	dict *dval;
+    dict *dval;
     int ref;
 } obj;
 
@@ -60,16 +61,16 @@ void o_del(obj **o) {
         if((*o)->type == T_STRING) {
             free((*o)->sval);
         }
-		if((*o)->type == T_DICT) {
+        if((*o)->type == T_DICT) {
             o_dict_del((*o)->dval);
-		}
+        }
         free(*o);
         *o = NULL;
     }
 }
 
 void o_dict_del(dict *d) {
-	dict *s = NULL, *tmp = NULL;
+    dict *s = NULL, *tmp = NULL;
     HASH_ITER(hh, d, s, tmp) {
         HASH_DEL(d, s);
         s->o->ref--;
@@ -101,128 +102,128 @@ obj *o_string(int lineno, const char *val) {
 }
 
 obj *o_dict(int lineno) {
-	obj *o = o_new(lineno);
-	o->type = T_DICT;
-	return o;
+    obj *o = o_new(lineno);
+    o->type = T_DICT;
+    return o;
 }
 
 obj *o_dict_set(int lineno, obj *od, obj *i, obj *o) {
-	dict *s = NULL, **d = &(od->dval);
+    dict *s = NULL, **d = &(od->dval);
 
-	if(od->type != T_DICT)
-		RT_ERR("line %d: not a dictionary\n", lineno);
+    if(od->type != T_DICT)
+        RT_ERR("line %d: not a dictionary\n", lineno);
 
-	HASH_FIND_STR(*d, i->sval, s);
-	if(!s) {
-		s = (dict *)calloc(sizeof(dict), 1);
-		if(!s)
-			RT_ERR("line %d: failed to allocate memory\n", lineno);
-		s->id = strdup(i->sval);
-		HASH_ADD_KEYPTR(hh, *d, s->id, strlen(s->id), s);
-	} else {
-		s->o->ref--;
-		o_del(&(s->o));
-	}
-	s->o = o;
-	s->o->ref++;
+    HASH_FIND_STR(*d, i->sval, s);
+    if(!s) {
+        s = (dict *)calloc(sizeof(dict), 1);
+        if(!s)
+            RT_ERR("line %d: failed to allocate memory\n", lineno);
+        s->id = strdup(i->sval);
+        HASH_ADD_KEYPTR(hh, *d, s->id, strlen(s->id), s);
+    } else {
+        s->o->ref--;
+        o_del(&(s->o));
+    }
+    s->o = o;
+    s->o->ref++;
 
-	o_del(&i);
-	return o;
+    o_del(&i);
+    return o;
 }
 
 obj *o_dict_get(int lineno, obj *od, obj *i) {
-	dict *s = NULL;
+    dict *s = NULL;
 
-	if(od->type != T_DICT)
-		RT_ERR("line %d: not a dictionary\n", lineno);
+    if(od->type != T_DICT)
+        RT_ERR("line %d: not a dictionary\n", lineno);
 
-	HASH_FIND_STR(od->dval, i->sval, s);
-	if(!s)
-		RT_ERR("line %d: key not found\n", lineno);
+    HASH_FIND_STR(od->dval, i->sval, s);
+    if(!s)
+        RT_ERR("line %d: key not found\n", lineno);
 
-	o_del(&i);
-	return s->o;
+    o_del(&i);
+    return s->o;
 }
 
 obj *o_dict_test(int lineno, obj *od, obj *i) {
-	dict *s = NULL;
-	obj *o = o_int(lineno, 1);
+    dict *s = NULL;
+    obj *o = o_int(lineno, 1);
 
-	if(od->type != T_DICT)
-		RT_ERR("line %d: not a dictionary\n", lineno);
+    if(od->type != T_DICT)
+        RT_ERR("line %d: not a dictionary\n", lineno);
 
-	HASH_FIND_STR(od->dval, i->sval, s);
-	if(!s)
-		o->ival = 0;
+    HASH_FIND_STR(od->dval, i->sval, s);
+    if(!s)
+        o->ival = 0;
 
-	o_del(&i);
-	return o;
+    o_del(&i);
+    return o;
 }
 
 obj *o_dict_index(int lineno, obj *o) {
-	obj *n = NULL;
+    obj *n = NULL;
 
-	switch(o->type) {
-		case T_STRING: /* shouldn't happen! */
-			return o;
-			break;
-		case T_INTEGER:
-			n = o_new(lineno);
-			/* FIXME */
-			n->sval = (char *)calloc(sizeof(char), 256);
-			if(!n->sval)
-				RT_ERR("line %d: failed to allocate memory", lineno);
-			snprintf(n->sval, 256, "%" PRId64, o->ival);
-			n->type = T_STRING;
-			break;
-		case T_FLOAT:
-			n = o_new(lineno);
-			/* FIXME */
-			n->sval = (char *)calloc(sizeof(char), 256);
-			if(!n->sval)
-				RT_ERR("line %d: failed to allocate memory", lineno);
-			snprintf(n->sval, 256, "%f", o->fval);
-			n->type = T_STRING;
-			break;
-		default:
-			RT_ERR("line %d: invalid dictionary key\n", lineno);
-			break;
-	}
+    switch(o->type) {
+        case T_STRING: /* shouldn't happen! */
+            return o;
+            break;
+        case T_INTEGER:
+            n = o_new(lineno);
+            /* FIXME */
+            n->sval = (char *)calloc(sizeof(char), 256);
+            if(!n->sval)
+                RT_ERR("line %d: failed to allocate memory", lineno);
+            snprintf(n->sval, 256, "%" PRId64, o->ival);
+            n->type = T_STRING;
+            break;
+        case T_FLOAT:
+            n = o_new(lineno);
+            /* FIXME */
+            n->sval = (char *)calloc(sizeof(char), 256);
+            if(!n->sval)
+                RT_ERR("line %d: failed to allocate memory", lineno);
+            snprintf(n->sval, 256, "%f", o->fval);
+            n->type = T_STRING;
+            break;
+        default:
+            RT_ERR("line %d: invalid dictionary key\n", lineno);
+            break;
+    }
 
-	o_del(&o);
-	return n;
+    o_del(&o);
+    return n;
 }
 
 obj *o_clone(int lineno, obj *o) {
     obj *n = NULL;
-	dict *s = NULL, *nd = NULL, *tmp = NULL;
+    dict *s = NULL, *nd = NULL, *tmp = NULL;
 
     switch(o->type) {
         case T_INTEGER:
             n = o_int(lineno, o->ival);
-			break;
+            break;
         case T_FLOAT:
             n = o_float(lineno, o->fval);
-			break;
+            break;
         case T_STRING:
             n = o_string(lineno, o->sval);
-			break;
-		case T_DICT:
-			n = o_dict(lineno);
-			n->ref++;
-			for(s=o->dval; s; s=s->hh.next) {
-				nd = (dict *)calloc(sizeof(dict), 1);
-				if(!nd)
-					RT_ERR("line %d: failed to allocate memory\n", lineno);
-				nd->id = strdup(s->id);
-				nd->o = o_clone(lineno, s->o);
-				nd->o->ref++;
-				HASH_ADD_KEYPTR(hh, tmp, nd->id, strlen(nd->id), nd);
-			}
-			n->dval = tmp;
-			break;
+            break;
+        case T_DICT:
+            n = o_dict(lineno);
+            n->ref++;
+            for(s=o->dval; s; s=s->hh.next) {
+                nd = (dict *)calloc(sizeof(dict), 1);
+                if(!nd)
+                    RT_ERR("line %d: failed to allocate memory\n", lineno);
+                nd->id = strdup(s->id);
+                nd->o = o_clone(lineno, s->o);
+                nd->o->ref++;
+                HASH_ADD_KEYPTR(hh, tmp, nd->id, strlen(nd->id), nd);
+            }
+            n->dval = tmp;
+            break;
     }
-	o_del(&o);
+    o_del(&o);
     return n;
 }
 
@@ -238,14 +239,14 @@ int o_lval(int lineno, obj *o) {
     switch(o->type) {
         case T_INTEGER:
             ret = o->ival;
-			break;
+            break;
         case T_FLOAT:
             ret = (int)o->fval;
-			break;
+            break;
         case T_STRING:
             ret = o->sval && strlen(o->sval);
             break;
-		case T_DICT:
+        case T_DICT:
             ret = HASH_COUNT(o->dval);
             break;
         default:
@@ -264,38 +265,38 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
     if(r == NULL) {
         switch(op) {
             default:
-				break;
+                break;
             case SUB: /* minus */
                 switch(l->type) {
                     case T_INTEGER:
                         o->ival = -l->ival;
-						break;
+                        break;
                     case T_FLOAT:
                         o->fval = -l->fval;
-						break;
+                        break;
                     default:
                         RT_ERR("line %d: unsupported type for unary '-'\n", lineno);
-						break;
+                        break;
                 }
-				break;
+                break;
             case NOT:
                 switch(l->type) {
                     case T_INTEGER:
                         o->ival = !l->ival;
-						break;
+                        break;
                     case T_STRING:
                         o->ival = !(l->sval && strlen(l->sval));
                         o->type = T_INTEGER;
-						break;
-					case T_DICT:
+                        break;
+                    case T_DICT:
                         o->ival = !HASH_COUNT(l->dval);
                         o->type = T_INTEGER;
-						break;
+                        break;
                     default:
                         RT_ERR("line %d: unsupported type for unary 'not'\n", lineno);
-						break;
+                        break;
                 }
-				break;
+                break;
         }
 
         o_del(&l);
@@ -317,7 +318,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 } else { /* to float */
                     tmp = o_float(lineno, (float)r->ival);
                 }
-				break;
+                break;
             case T_FLOAT:
                 if(l->type == T_STRING) {
                     tmp = o_new(lineno);
@@ -330,10 +331,10 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 } else { /* to integer */
                     tmp = o_int(lineno, (int)r->fval);
                 }
-				break;
-			default:
+                break;
+            default:
                 RT_ERR("line %d: unsupported conversion\n", lineno);
-				break;
+                break;
         }
         o_del(&r);
         r = tmp;
@@ -341,225 +342,225 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
 
     switch(op) {
         default:
-			break;
+            break;
         case ADD:
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival + r->ival;
-					break;
+                    break;
                 case T_FLOAT:
                     o->fval = l->fval + r->fval;
-					break;
+                    break;
                 case T_STRING:
                     o->sval = (char *)calloc(sizeof(char), strlen(l->sval)+strlen(r->sval)+1);
                     strncpy(o->sval, l->sval, strlen(l->sval));
                     strncpy(o->sval+strlen(l->sval), r->sval, strlen(r->sval));
-					break;
-				default:
-					RT_ERR("line %d: unsupported type for '+'\n", lineno);
-					break;
+                    break;
+                default:
+                    RT_ERR("line %d: unsupported type for '+'\n", lineno);
+                    break;
             }
-			break;
+            break;
         case SUB:
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival - r->ival;
-					break;
+                    break;
                 case T_FLOAT:
                     o->fval = l->fval - r->fval;
-					break;
+                    break;
                 default:
                     RT_ERR("line %d: unsupported type for '-'\n", lineno);
-					break;
+                    break;
             }
-			break;
+            break;
         case MUL:
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival * r->ival;
-					break;
+                    break;
                 case T_FLOAT:
                     o->fval = l->fval * r->fval;
-					break;
+                    break;
                 default:
                     RT_ERR("line %d: unsupported type for '*'\n", lineno);
-					break;
+                    break;
             }
-			break;
+            break;
         case DIV:
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival / r->ival;
-					break;
+                    break;
                 case T_FLOAT:
                     o->fval = l->fval / r->fval;
-					break;
+                    break;
                 default:
                     RT_ERR("line %d: unsupported type for '/'\n", lineno);
-					break;
+                    break;
             }
-			break;
+            break;
         case GT:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival > r->ival;
-					break;
+                    break;
                 case T_FLOAT:
                     o->ival = l->fval > r->fval;
-					break;
+                    break;
                 case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) > 0;
-					break;
-				case T_DICT:
-					o->ival = HASH_COUNT(l->dval) > HASH_COUNT(r->dval);
-					break;
-				default:
-					RT_ERR("line %d: unsupported type for '>'\n", lineno);
-					break;
+                    break;
+                case T_DICT:
+                    o->ival = HASH_COUNT(l->dval) > HASH_COUNT(r->dval);
+                    break;
+                default:
+                    RT_ERR("line %d: unsupported type for '>'\n", lineno);
+                    break;
             }
-			break;
+            break;
         case GE:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival >= r->ival;
-					break;
+                    break;
                 case T_FLOAT:
                     o->ival = l->fval >= r->fval;
-					break;
+                    break;
                 case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) >= 0;
-					break;
-				case T_DICT:
-					o->ival = HASH_COUNT(l->dval) >= HASH_COUNT(r->dval);
-					break;
-				default:
-					RT_ERR("line %d: unsupported type for '>='\n", lineno);
-					break;
+                    break;
+                case T_DICT:
+                    o->ival = HASH_COUNT(l->dval) >= HASH_COUNT(r->dval);
+                    break;
+                default:
+                    RT_ERR("line %d: unsupported type for '>='\n", lineno);
+                    break;
             }
-			break;
+            break;
         case LT:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival < r->ival;
-					break;
+                    break;
                 case T_FLOAT:
                     o->ival = l->fval < r->fval;
-					break;
-				case T_STRING:
+                    break;
+                case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) < 0;
-					break;
-				case T_DICT:
-					o->ival = HASH_COUNT(l->dval) < HASH_COUNT(r->dval);
-					break;
-				default:
-					RT_ERR("line %d: unsupported type for '<'\n", lineno);
-					break;
+                    break;
+                case T_DICT:
+                    o->ival = HASH_COUNT(l->dval) < HASH_COUNT(r->dval);
+                    break;
+                default:
+                    RT_ERR("line %d: unsupported type for '<'\n", lineno);
+                    break;
             }
-			break;
+            break;
         case LE:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival <= r->ival;
-					break;
+                    break;
                 case T_FLOAT:
                     o->ival = l->fval <= r->fval;
-					break;
+                    break;
                 case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) <= 0;
-					break;
-				case T_DICT:
-					o->ival = HASH_COUNT(l->dval) <= HASH_COUNT(r->dval);
-					break;
-				default:
-					RT_ERR("line %d: unsupported type for '<='\n", lineno);
-					break;
+                    break;
+                case T_DICT:
+                    o->ival = HASH_COUNT(l->dval) <= HASH_COUNT(r->dval);
+                    break;
+                default:
+                    RT_ERR("line %d: unsupported type for '<='\n", lineno);
+                    break;
             }
-			break;
+            break;
         case EQ:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival == r->ival;
-					break;
+                    break;
                 case T_FLOAT:
                     o->ival = l->fval == r->fval;
-					break;
+                    break;
                 case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) == 0;
-					break;
-				case T_DICT:
-					/* FIXME? */
-					o->ival = HASH_COUNT(l->dval) == HASH_COUNT(r->dval);
-					break;
-				default:
-					RT_ERR("line %d: unsupported type for '='\n", lineno);
-					break;
+                    break;
+                case T_DICT:
+                    /* FIXME? */
+                    o->ival = HASH_COUNT(l->dval) == HASH_COUNT(r->dval);
+                    break;
+                default:
+                    RT_ERR("line %d: unsupported type for '='\n", lineno);
+                    break;
             }
-			break;
+            break;
         case NE:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival != r->ival;
-					break;
+                    break;
                 case T_FLOAT:
                     o->ival = l->fval != r->fval;
-					break;
+                    break;
                 case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) != 0;
-					break;
-				case T_DICT:
-					/* FIXME? */
-					o->ival = HASH_COUNT(l->dval) != HASH_COUNT(r->dval);
-					break;
-				default:
-					RT_ERR("line %d: unsupported type for '<>'\n", lineno);
-					break;
+                    break;
+                case T_DICT:
+                    /* FIXME? */
+                    o->ival = HASH_COUNT(l->dval) != HASH_COUNT(r->dval);
+                    break;
+                default:
+                    RT_ERR("line %d: unsupported type for '<>'\n", lineno);
+                    break;
             }
-			break;
+            break;
         case AND:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival && r->ival;
-					break;
-				case T_DICT:
-					o->ival = HASH_COUNT(l->dval) && HASH_COUNT(r->dval);
-					break;
+                    break;
+                case T_DICT:
+                    o->ival = HASH_COUNT(l->dval) && HASH_COUNT(r->dval);
+                    break;
                 default:
                     RT_ERR("line %d: unsupported type for 'and'\n", lineno);
-					break;
+                    break;
             }
-			break;
+            break;
         case OR:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival || r->ival;
-					break;
-				case T_DICT:
-					o->ival = HASH_COUNT(l->dval) || HASH_COUNT(r->dval);
-					break;
+                    break;
+                case T_DICT:
+                    o->ival = HASH_COUNT(l->dval) || HASH_COUNT(r->dval);
+                    break;
                 default:
                     RT_ERR("line %d: unsupported type for 'or'\n", lineno);
-					break;
+                    break;
             }
-			break;
+            break;
         case MOD:
             o->type = T_INTEGER;
             switch(l->type) {
                 case T_INTEGER:
                     o->ival = l->ival % r->ival;
-					break;
+                    break;
                 default:
                     RT_ERR("line %d: unsupported type for 'mod'\n", lineno);
-					break;
+                    break;
             }
-			break;
+            break;
     } /* switch(op) */
 
     o_del(&l);
@@ -569,42 +570,42 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
 }
 
 void o_print(obj *o) {
-	dict *s = NULL;
+    dict *s = NULL;
 
-	switch(o->type) {
-		case T_INTEGER:
-			printf("%" PRId64, o->ival);
-			break;
-		case T_FLOAT:
-			printf("%f", o->fval);
-			break;
-		case T_STRING:
-			printf("%s", o->sval);
-			break;
-		case T_DICT:
-			if(o->dval) {
-				printf("{ ");
-				for(s=o->dval; s; s=s->hh.next) {
-					printf("%s: ", s->id);
-					o_print(s->o);
-					if(s->hh.next) {
-						printf(", ");
-					}
-				}
-				printf(" }");
-			} else {
-				printf("{}");
-			}
-			break;
-	}
+    switch(o->type) {
+        case T_INTEGER:
+            printf("%" PRId64, o->ival);
+            break;
+        case T_FLOAT:
+            printf("%f", o->fval);
+            break;
+        case T_STRING:
+            printf("%s", o->sval);
+            break;
+        case T_DICT:
+            if(o->dval) {
+                printf("{ ");
+                for(s=o->dval; s; s=s->hh.next) {
+                    printf("%s: ", s->id);
+                    o_print(s->o);
+                    if(s->hh.next) {
+                        printf(", ");
+                    }
+                }
+                printf(" }");
+            } else {
+                printf("{}");
+            }
+            break;
+    }
 }
 
 /* object storage */
 typedef struct st {
-	int index;
+    int index;
     int lineno;
     obj *o;
-	UT_hash_handle hh;
+    UT_hash_handle hh;
 } st;
 
 obj *store(st **ctx, int lineno, int id, obj *o) {
@@ -616,39 +617,39 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
         if(!s)
             RT_ERR("line %d: failed to allocate memory\n", lineno);
         s->index = id;
-		HASH_ADD_INT(*ctx, index, s);
+        HASH_ADD_INT(*ctx, index, s);
         s->o = o;
-		/* this is just to avoid freeing this object because
-		 * it is associated to a stored variable */
-		s->o->ref++;
+        /* this is just to avoid freeing this object because
+         * it is associated to a stored variable */
+        s->o->ref++;
     } else {
-		if(o == s->o)
-			/* in fact we can */
-			RT_ERR("line %d: can't assign to itself\n", lineno);
+        if(o == s->o)
+            /* in fact we can */
+            RT_ERR("line %d: can't assign to itself\n", lineno);
 
-		/* replace the existing object, it already has a reference */
+        /* replace the existing object, it already has a reference */
         if(s->o->type == T_STRING) {
             free(s->o->sval);
         }
         switch(o->type) {
             case T_INTEGER:
                 s->o->ival = o->ival;
-				break;
+                break;
             case T_FLOAT:
                 s->o->fval = o->fval;
-				break;
+                break;
             case T_STRING:
                 s->o->sval = strdup(o->sval);
-				break;
+                break;
             case T_DICT:
                 s->o->dval = o->dval;
-				break;
+                break;
         }
         s->o->type = o->type;
     }
     s->lineno = lineno;
 
-	o_del(&o);
+    o_del(&o);
     return s->o;
 }
 
@@ -656,7 +657,7 @@ obj *retrieve(st **ctx, int lineno, int id) {
     st *s = NULL;
 
     HASH_FIND_INT(*ctx, &id, s);
-	if(!s)
+    if(!s)
         RT_ERR("line %d: undefined identifier\n", lineno);
     return s->o;
 }
@@ -687,7 +688,7 @@ void println(int argc, ...) {
     va_start(argv, argc);
     for(i=0; i<argc; i++) {
         o = va_arg(argv, obj *);
-		o_print(o);
+        o_print(o);
         o_del(&o);
     }
     va_end(argv);
