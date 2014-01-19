@@ -169,7 +169,7 @@ So basically you can convert between integer and float, and to strings.
 Dictionaries
 ------------
 
-The language support dictionaries. A dictionary can be created with **{}**. For example::
+The language supports dictionaries. A dictionary can be created with **{}**. For example::
 
   def main() {
     a := {};
