@@ -1,4 +1,4 @@
-/* ex: set softtabstop=4 shiftwidth=4 expandtab: */
+/* vim: set softtabstop=4 shiftwidth=4 expandtab: */
 #ifndef __RT_H__
 #define __RT_H__
 
