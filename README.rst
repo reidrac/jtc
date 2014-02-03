@@ -135,7 +135,7 @@ Supported statements in the language are:
 
 :typeof(*identifier*):
     Returns a string with the type of the variable. It can be "<integer>" for integers,
-    "<float>" for floats and "<string>" for strings.
+    "<float>" for floats, "<string>" for strings and "<dictionary>" for dictionaries.
 
 :clone(*identifier*):
     Returns a copy of the contents of the variable (**jt** uses references).
