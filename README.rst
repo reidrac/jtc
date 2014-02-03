@@ -37,6 +37,7 @@ The compiler requires:
 - PLY (3.4 used).
 - uthash (included in the package).
 - A C compiler (by default **gcc**, you can specify a different one with the `CC` env variable).
+- The Boehm-Demers-Weiser conservative garbage collector (optional but recommended, disable it with `--no-gc` flag, 7.2d used).
 
 You can use test the compiler with::
 
@@ -49,8 +50,7 @@ It should print `55`.
 About the language (jt)
 -----------------------
 
-It's a toy language and I don't think it's useful for anything, specially because
-I bet the compiled programs will leak memory (although it might not).
+It's a toy language and I don't think it's useful for anything.
 
 The program entry point is a function, defined with **def**::
 

@@ -11,8 +11,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <string.h>
 #include <inttypes.h>
+
+#ifndef DISABLE_GC
+#include <gc.h>
+#endif
 
 #include "uthash.h"
 
@@ -29,6 +32,41 @@ enum openum { ADD=0, SUB, MUL, DIV, EQ, NE, GT, LT, GE, LE, AND, OR, MOD, NOT };
 
 #undef uthash_fatal
 #define uthash_fatal(msg) RT_ERR(msg);
+
+#undef uthash_malloc
+#undef uthash_free
+
+#define uthash_malloc(sz) mcalloc(1, sz)
+#define uthash_free(ptr,sz) mfree(ptr)
+
+/* GC abstraction */
+
+void *mcalloc(size_t count, size_t size) {
+    void *p;
+#ifndef DISABLE_GC
+    p = GC_malloc(size*count);
+    if(!p)
+        return NULL;
+    return memset(p, 0, size*count);
+#else
+    p = calloc(count, size);
+#endif
+    return p;
+}
+
+#ifndef DISABLE_GC
+#define mfree(x) GC_free(x)
+#else
+#define mfree(x) free(x)
+#endif
+
+char *mstrdup(const char *s) {
+    size_t len = strlen(s) + 1;
+    void *new = mcalloc(len, sizeof(char));
+    if(!new)
+        return NULL;
+    return memcpy(new, s, len);
+}
 
 /* object system */
 
@@ -48,7 +86,7 @@ typedef struct obj {
 } obj;
 
 obj *o_new(int lineno) {
-    obj *o = (obj *)calloc(sizeof(obj), 1);
+    obj *o = (obj *)mcalloc(1, sizeof(obj));
     if(!o)
         RT_ERR("line %d: failed to allocate memory\n", lineno);
     return o;
@@ -59,12 +97,12 @@ void o_dict_del(dict *d);
 void o_del(obj **o) {
     if((*o)->ref < 1) {
         if((*o)->type == T_STRING) {
-            free((*o)->sval);
+            mfree((*o)->sval);
         }
         if((*o)->type == T_DICT) {
             o_dict_del((*o)->dval);
         }
-        free(*o);
+        mfree(*o);
         *o = NULL;
     }
 }
@@ -75,8 +113,8 @@ void o_dict_del(dict *d) {
         HASH_DEL(d, s);
         s->o->ref--;
         o_del(&(s->o));
-        free(s->id);
-        free(s);
+        mfree(s->id);
+        mfree(s);
     }
 }
 
@@ -97,7 +135,7 @@ obj *o_float(int lineno, float val) {
 obj *o_string(int lineno, const char *val) {
     obj *o = o_new(lineno);
     o->type = T_STRING;
-    o->sval = strdup(val);
+    o->sval = mstrdup(val);
     return o;
 }
 
@@ -115,10 +153,10 @@ obj *o_dict_set(int lineno, obj *od, obj *i, obj *o) {
 
     HASH_FIND_STR(*d, i->sval, s);
     if(!s) {
-        s = (dict *)calloc(sizeof(dict), 1);
+        s = (dict *)mcalloc(1, sizeof(dict));
         if(!s)
             RT_ERR("line %d: failed to allocate memory\n", lineno);
-        s->id = strdup(i->sval);
+        s->id = mstrdup(i->sval);
         HASH_ADD_KEYPTR(hh, *d, s->id, strlen(s->id), s);
     } else {
         s->o->ref--;
@@ -170,7 +208,7 @@ obj *o_dict_index(int lineno, obj *o) {
         case T_INTEGER:
             n = o_new(lineno);
             /* FIXME */
-            n->sval = (char *)calloc(sizeof(char), 256);
+            n->sval = (char *)mcalloc(256, sizeof(char));
             if(!n->sval)
                 RT_ERR("line %d: failed to allocate memory", lineno);
             snprintf(n->sval, 256, "%" PRId64, o->ival);
@@ -179,7 +217,7 @@ obj *o_dict_index(int lineno, obj *o) {
         case T_FLOAT:
             n = o_new(lineno);
             /* FIXME */
-            n->sval = (char *)calloc(sizeof(char), 256);
+            n->sval = (char *)mcalloc(256, sizeof(char));
             if(!n->sval)
                 RT_ERR("line %d: failed to allocate memory", lineno);
             snprintf(n->sval, 256, "%f", o->fval);
@@ -212,10 +250,10 @@ obj *o_clone(int lineno, obj *o) {
             n = o_dict(lineno);
             n->ref++;
             for(s=o->dval; s; s=s->hh.next) {
-                nd = (dict *)calloc(sizeof(dict), 1);
+                nd = (dict *)mcalloc(1, sizeof(dict));
                 if(!nd)
                     RT_ERR("line %d: failed to allocate memory\n", lineno);
-                nd->id = strdup(s->id);
+                nd->id = mstrdup(s->id);
                 nd->o = o_clone(lineno, s->o);
                 nd->o->ref++;
                 HASH_ADD_KEYPTR(hh, tmp, nd->id, strlen(nd->id), nd);
@@ -310,7 +348,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 if(l->type == T_STRING) {
                     tmp = o_new(lineno);
                     /* FIXME */
-                    tmp->sval = (char *)calloc(sizeof(char), 256);
+                    tmp->sval = (char *)mcalloc(256, sizeof(char));
                     if(!tmp->sval)
                         RT_ERR("line %d: failed to allocate memory", lineno);
                     snprintf(tmp->sval, 256, "%" PRId64, r->ival);
@@ -323,7 +361,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                 if(l->type == T_STRING) {
                     tmp = o_new(lineno);
                     /* FIXME */
-                    tmp->sval = (char *)calloc(sizeof(char), 256);
+                    tmp->sval = (char *)mcalloc(256, sizeof(char));
                     if(!tmp->sval)
                         RT_ERR("line %d: failed to allocate memory", lineno);
                     snprintf(tmp->sval, 256, "%f", r->fval);
@@ -352,7 +390,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                     o->fval = l->fval + r->fval;
                     break;
                 case T_STRING:
-                    o->sval = (char *)calloc(sizeof(char), strlen(l->sval)+strlen(r->sval)+1);
+                    o->sval = (char *)mcalloc(strlen(l->sval)+strlen(r->sval)+1, sizeof(char));
                     strncpy(o->sval, l->sval, strlen(l->sval));
                     strncpy(o->sval+strlen(l->sval), r->sval, strlen(r->sval));
                     break;
@@ -613,13 +651,13 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
 
     HASH_FIND_INT(*ctx, &id, s);
     if(!s) {
-        s = (st *)calloc(sizeof(st), 1);
+        s = (st *)mcalloc(1, sizeof(st));
         if(!s)
             RT_ERR("line %d: failed to allocate memory\n", lineno);
         s->index = id;
         HASH_ADD_INT(*ctx, index, s);
         s->o = o;
-        /* this is just to avoid freeing this object because
+        /* this is just to avoid mfreeing this object because
          * it is associated to a stored variable */
         s->o->ref++;
     } else {
@@ -629,7 +667,7 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
 
         /* replace the existing object, it already has a reference */
         if(s->o->type == T_STRING) {
-            free(s->o->sval);
+            mfree(s->o->sval);
         }
         switch(o->type) {
             case T_INTEGER:
@@ -639,7 +677,7 @@ obj *store(st **ctx, int lineno, int id, obj *o) {
                 s->o->fval = o->fval;
                 break;
             case T_STRING:
-                s->o->sval = strdup(o->sval);
+                s->o->sval = mstrdup(o->sval);
                 break;
             case T_DICT:
                 s->o->dval = o->dval;
@@ -670,7 +708,7 @@ obj *o_return(st **ctx, obj *o) {
         HASH_DEL(*ctx, s);
         s->o->ref--;
         o_del(&s->o);
-        free(s);
+        mfree(s);
     }
     o->ref--;
 
@@ -697,6 +735,13 @@ void println(int argc, ...) {
 
 /* C entry point */
 int main() {
+#ifndef DISABLE_GC
+    GC_INIT();
+#ifdef RTE_DEBUG
+    unsigned int _gc_ver = GC_get_version();
+    printf("** GC ON: %d.%d **\n", (_gc_ver>>16) & 0xff, (_gc_ver>>8) & 0xff);
+#endif
+#endif
 #ifdef RTE_DEBUG
     printf("** RTE_DEBUG ON **\n");
     mtrace();

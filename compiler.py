@@ -254,6 +254,7 @@ if __name__ == "__main__":
     ap.add_argument("--parser", action="store_true", help="dump parser output and exit")
     ap.add_argument("-c", action="store_true", help="dump C output and exit")
     ap.add_argument("--debug", action="store_true", help="enable debug")
+    ap.add_argument("--no-gc", action="store_true", help="disable the garbage collector")
     ap.add_argument("--verbose", action="store_true", help="enable verbose output")
     ap.add_argument("--version", action="version", version="%(prog)s " + __version__)
 
@@ -317,6 +318,10 @@ if __name__ == "__main__":
         if cflags:
             cmd += cflags.split(" ")
         cmd +=  ["-std=c99", "-Wall", "-I%s" % path.join(home, "include"), fd.name, "-o", source + ".out"]
+        if not args.no_gc:
+            cmd.append("-lgc")
+        else:
+            cmd.append("-DDISABLE_GC")
         if args.debug:
             cmd.append("-ggdb")
         else:
