@@ -3,7 +3,7 @@
 from sys import exit, stdin
 from os import environ, path, unlink
 from tempfile import NamedTemporaryFile
-from subprocess import call
+from subprocess import Popen, PIPE
 from argparse import ArgumentParser
 
 import parser
@@ -329,8 +329,12 @@ if __name__ == "__main__":
         if args.verbose:
             print("compiling:", ' '.join(cmd))
         try:
-            if call(cmd) != 0:
-                print("compiled with C errors")
+            p = Popen(cmd, stderr=PIPE, close_fds=True)
+            if p.wait() != 0:
+                errors = p.stderr.read()
+                if b"-lgc" in errors:
+                    print("*** gc not found, use --no-gc to disable the garbage collector")
+                print("%s output: %r" % (cc, errors))
                 exit(1)
         except BaseException as ex:
             print("error running the C compiler: %s" % ex)
