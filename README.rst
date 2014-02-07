@@ -33,7 +33,7 @@ Requirements
 
 The compiler requires:
 
-- Python 3 (3.3.2 used).
+- Python 3 (3.3.2 used; but Python 2.7 should work).
 - PLY (3.4 used).
 - uthash (included in the package).
 - A C compiler (by default **gcc**, you can specify a different one with the `CC` env variable).
