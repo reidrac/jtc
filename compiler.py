@@ -10,7 +10,7 @@ import parser
 import lexer
 
 __author__ = "Juan J. Martinez <jjm@usebox.net>"
-__version__ = "0.6.1"
+__version__ = "0.6.2"
 app_name = "JTC"
 project_url = "http://www.usebox.net/jjm/jtc/"
 
@@ -332,7 +332,7 @@ if __name__ == "__main__":
             p = Popen(cmd, stderr=PIPE, close_fds=True)
             if p.wait() != 0:
                 errors = p.stderr.read()
-                if b"-lgc" in errors:
+                if any(e in errors for e in (b"-lgc",  b"gc.h:")):
                     print("*** gc not found, use --no-gc to disable the garbage collector")
                 print("%s output: %r" % (cc, errors))
                 exit(1)
