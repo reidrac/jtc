@@ -1,0 +1,6 @@
+1. create ~/.vim/ftdetect/jt.vim with the following contents:
+
+au BufRead,BufNewFile *.jt set filetype=jt
+
+2. copy jt.vim to ~/.vim/syntax/
+
