@@ -1,0 +1,30 @@
+#  Write a program that prints the numbers from 1 to 100. But for 
+#  multiples of three print “Fizz” instead of the number and for
+#  the multiples of five print “Buzz”. For numbers which are
+#  multiples of both three and five print “FizzBuzz”.
+#
+def main() {
+	def fizzbuzz(n) {
+		out := "";
+
+		if (n mod 3 = 0) {
+			out := "Fizz";
+		}
+		if (n mod 5 = 0) {
+			out := out + "Buzz";
+		}
+
+		if(not out) {
+			return n;
+		}
+
+		return out;
+	}
+
+	i := 1;
+	loop(i <= 100) {
+		println(fizzbuzz(i));	
+		i := i + 1;
+	}
+}
+
