@@ -1,0 +1,125 @@
+def main() {
+
+	def assert(val, exp, text) {
+		if(val = exp) {
+			println(text, ": ok");
+			return 1;
+		}
+		println(text, ": FAILED (", exp, " expected, ", val, " found)");
+		return 0;
+	}
+
+	r := 0;
+	r := r + assert(1 + 1, 2, "integer add");
+	r := r + assert(1 - 1, 0, "integer sub");
+	r := r + assert(2 * 2, 4, "integer mul");
+	r := r + assert(2 / 2, 1, "integer div");
+	r := r + assert(3 / 2, 1, "integer div (reminder)");
+	r := r + assert(2 mod 2, 0, "integer mod");
+	r := r + assert(3 mod 2, 1, "integer mod (reminder)");
+	r := r + assert(-1, -1, "integer minus");
+	r := r + assert(not 1, 0, "integer not");
+	r := r + assert(1 = 1, 1, "integer eq");
+	r := r + assert(1 = 2, 0, "integer eq (false)");
+	r := r + assert(1 <> 2, 1, "integer ne");
+	r := r + assert(1 <> 1, 0, "integer ne (false)");
+	r := r + assert(2 > 1, 1, "integer gt");
+	r := r + assert(1 > 2, 0, "integer gt (false)");
+	r := r + assert(2 >= 1, 1, "integer gte");
+	r := r + assert(1 >= 1, 1, "integer gte (eq)");
+	r := r + assert(1 >= 2, 0, "integer gt (false)");
+	r := r + assert(1 < 2, 1, "integer lt");
+	r := r + assert(2 < 1, 0, "integer lt (false)");
+	r := r + assert(1 <= 2, 1, "integer lte");
+	r := r + assert(1 <= 1, 1, "integer lte (eq)");
+	r := r + assert(2 <= 1, 0, "integer lte (false)");
+	r := r + assert(1 and 1, 1, "integer and");
+	r := r + assert(0 and 1, 0, "integer and");
+	r := r + assert(1 and 0, 0, "integer and");
+	r := r + assert(1 or 1, 1, "integer or");
+	r := r + assert(0 or 1, 1, "integer or");
+	r := r + assert(1 or 0, 1, "integer or");
+	r := r + assert(0 or 0, 0, "integer or");
+
+	r := r + assert(1.1 + 1.1, 2.2, "float add");
+	r := r + assert(1.2 - 1.1, 0.1, "float sub");
+	r := r + assert(2.2 * 2.2, 4.84, "float mul");
+	r := r + assert(2.0 / 2.0, 1.0, "float div");
+	r := r + assert(3.0 / 2.0, 1.5, "float div (reminder)");
+	r := r + assert(-1.0, -1.0, "float minus");
+	r := r + assert(0.1 = 0.1, 1, "float eq");
+	r := r + assert(0.1 = 0.2, 0, "float eq (false)");
+	r := r + assert(0.1 <> 0.2, 1, "float ne");
+	r := r + assert(0.1 <> 0.1, 0, "float ne (false)");
+	r := r + assert(0.2 > 0.1, 1, "float gt");
+	r := r + assert(0.1 > 0.2, 0, "float gt (false)");
+	r := r + assert(0.2 >= 0.1, 1, "float gte");
+	r := r + assert(0.1 >= 0.1, 1, "float gte (eq)");
+	r := r + assert(0.1 >= 0.2, 0, "float gt (false)");
+	r := r + assert(0.1 < 0.2, 1, "float lt");
+	r := r + assert(0.2 < 0.1, 0, "float lt (false)");
+	r := r + assert(0.1 <= 0.2, 1, "float lte");
+	r := r + assert(0.1 <= 0.1, 1, "float lte (eq)");
+	r := r + assert(0.2 <= 0.1, 0, "float lte (false)");
+	r := r + assert(0.0001, 0.0001, "float comparison limit");
+	r := r + assert(0.00002, 0.0001, "float comparison limit");
+
+	r := r + assert("foo" + "bar", "foobar", "string add");
+	r := r + assert("foo" = "foo", 1, "string eq");
+	r := r + assert("foo" = "bar", 0, "string eq (false)");
+	r := r + assert("foo" <> "bar", 1, "string ne");
+	r := r + assert("foo" <> "foo", 0, "string ne (false)");
+	r := r + assert(not "a", 0, "not empty string");
+	r := r + assert(not "", 1, "empty string (not)");
+	r := r + assert("ba"> "aa", 1, "string gt");
+	r := r + assert("aa" > "ba", 0, "string gt (false)");
+	r := r + assert("ba" >= "aa", 1, "string gte");
+	r := r + assert("aa" >= "aa", 1, "string gte (eq)");
+	r := r + assert("aa" >= "ba", 0, "string gt (false)");
+	r := r + assert("aa" < "ba", 1, "string lt");
+	r := r + assert("ba" < "aa", 0, "string lt (false)");
+	r := r + assert("aa" <= "ba", 1, "string lte");
+	r := r + assert("aa" <= "aa", 1, "string lte (eq)");
+	r := r + assert("ba" <= "aa", 0, "string lte (false)");
+
+    r := r + assert(not {}, 1, "dictionary not (empty)");
+    d := {}; d{0} := 1;
+    r := r + assert(not d, 0, "dictionary not (false)");
+    r := r + assert(d > {}, 1, "dictionary gt");
+    r := r + assert({} > d, 0, "dictionary gt (false)");
+    r := r + assert(d >= {}, 1, "dictionary gte");
+    r := r + assert(d >= d, 1, "dictionary gte (eq)");
+    r := r + assert({} >= d, 0, "dictionary gte (false)");
+    r := r + assert({} < d, 1, "dictionary lt");
+    r := r + assert(d < {}, 0, "dictionary lt (false)");
+    r := r + assert({} <= d, 1, "dictionary lte");
+    r := r + assert(d <= d, 1, "dictionary lte (eq)");
+    r := r + assert(d <= {}, 0, "dictionary lte (false)");
+    r := r + assert({} = {}, 1, "dictionary eq (empty)");
+    r := r + assert(d = d, 1, "dictionary eq");
+    r := r + assert({} = d, 1, "dictionary eq (false)");
+    r := r + assert(d <> {}, 1, "dictionary ne");
+    r := r + assert(d <> d, 1, "dictionary ne (false)");
+    r := r + assert({} <> {}, 1, "dictionary ne (false, empty)");
+    r := r + assert({} and {}, 0, "dictionary and (empty)");
+    r := r + assert(d and d, 1, "dictionary and");
+    r := r + assert({} and d, 0, "dictionary and (false)");
+    r := r + assert({} or {}, 0, "dictionary or (empty)");
+    r := r + assert(d or d, 1, "dictionary or");
+    r := r + assert({} or d, 1, "dictionary or");
+
+    r := r + assert("foo" + 1, "foo1", "conversion integer to string");
+    r := r + assert(typeof("foo" + 1), "<string>", "conversion integer to string (typeof)");
+    r := r + assert("foo" + 1.1, "foo1.100000", "conversion float to string");
+    r := r + assert(typeof("foo" + 1.1), "<string>", "conversion float to string (typeof)");
+
+	total := 94;
+
+	if(r < total) {
+		println(total-r, " test(s) failed");
+		return 1;
+	}
+	println(r, " test(s) passed");
+	return 0;
+}
+
