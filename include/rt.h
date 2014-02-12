@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <inttypes.h>
+#include <math.h>
 
 #ifndef DISABLE_GC
 #include <gc.h>
@@ -295,6 +296,11 @@ int o_lval(int lineno, obj *o) {
     return ret;
 }
 
+double ftrunc(float n) {
+    double r = 10000.0*n;
+    return (r > 0) ? floor(r) : ceil(r);
+}
+
 obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
     obj *o = o_new(lineno), *tmp = NULL;
     o->type = l->type;
@@ -525,7 +531,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                     o->ival = l->ival == r->ival;
                     break;
                 case T_FLOAT:
-                    o->ival = l->fval == r->fval;
+                    o->ival = ftrunc(l->fval) == ftrunc(r->fval);
                     break;
                 case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) == 0;
@@ -546,7 +552,7 @@ obj *o_op(int lineno, enum openum op, obj *l, obj *r) {
                     o->ival = l->ival != r->ival;
                     break;
                 case T_FLOAT:
-                    o->ival = l->fval != r->fval;
+                    o->ival = ftrunc(l->fval) != ftrunc(r->fval);
                     break;
                 case T_STRING:
                     o->ival = strcmp(l->sval, r->sval) != 0;

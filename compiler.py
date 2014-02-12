@@ -317,7 +317,7 @@ if __name__ == "__main__":
         cmd = [cc,]
         if cflags:
             cmd += cflags.split(" ")
-        cmd +=  ["-std=c99", "-Wall", "-I%s" % path.join(home, "include"), fd.name, "-o", source + ".out"]
+        cmd +=  ["-std=c99", "-Wall", "-I%s" % path.join(home, "include"), fd.name, "-o", source + ".out", "-lm"]
         if not args.no_gc:
             cmd.append("-lgc")
         else:
